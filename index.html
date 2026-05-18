@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YG小糖罐 - 代码糖果收藏馆</title>
+    <style>
+        :root {
+            --bg: #f5f0f8;
+            --card-bg: #ffffff;
+            --blue-light: #e3f2fd;
+            --blue-mid: #b3d9ff;
+            --blue-strong: #7eb8da;
+            --orange-light: #fff3e0;
+            --orange-mid: #ffe0b2;
+            --orange-strong: #ffb74d;
+            --orange-deep: #ff9800;
+            --orange-warm: #ff8c52;
+            --text: #4a4458;
+            --text-light: #7a7288;
+            --text-lighter: #9a92a8;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.07), 0 2px 6px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.09), 0 3px 10px rgba(0, 0, 0, 0.05);
+            --radius-sm: 8px;
+            --radius: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 24px;
+            --font-mono: 'SF Mono', 'Cascadia Code', 'Consolas', 'Monaco', 'Menlo', 'Courier New', monospace;
+            --font-sans: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: linear-gradient(160deg, #e8f4fd 0%, #f0e8f6 25%, #fff8f0 50%, #fef5e7 75%, #e3f2fd 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text);
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 背景装饰 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -120px;
+            right: -100px;
+            width: 380px;
+            height: 380px;
+            background: radial-gradient(circle, rgba(255, 183, 77, 0.13) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -140px;
+            left: -90px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(179, 217, 255, 0.16) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 浮动装饰糖果 */
+        .floating-candy {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            font-size: 28px;
+            opacity: 0.5;
+            animation: floatCandy 8s ease-in-out infinite;
+            filter: blur(0.5px);
+        }
+        .floating-candy:nth-child(1) {
+            top: 8%;
+            left: 5%;
+            animation-delay: 0s;
+            font-size: 24px;
+            opacity: 0.4;
+        }
+        .floating-candy:nth-child(2) {
+            top: 15%;
+            right: 8%;
+            animation-delay: -3s;
+            font-size: 32px;
+            opacity: 0.45;
+        }
+        .floating-candy:nth-child(3) {
+            bottom: 18%;
+            left: 10%;
+            animation-delay: -5.5s;
+            font-size: 20px;
+            opacity: 0.35;
+        }
+        .floating-candy:nth-child(4) {
+            bottom: 25%;
+            right: 12%;
+            animation-delay: -1.5s;
+            font-size: 26px;
+            opacity: 0.4;
+        }
+        @keyframes floatCandy {
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg) scale(1);
+            }
+            20% {
+                transform: translateY(-18px) rotate(8deg) scale(1.08);
+            }
+            40% {
+                transform: translateY(-6px) rotate(-5deg) scale(0.94);
+            }
+            60% {
+                transform: translateY(-22px) rotate(3deg) scale(1.05);
+            }
+            80% {
+                transform: translateY(-10px) rotate(-3deg) scale(0.97);
+            }
+        }
+
+        /* 主容器 */
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* 头部 */
+        .header {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 16px 24px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            border: 1px solid rgba(255, 183, 77, 0.18);
+            position: relative;
+            overflow: hidden;
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #b3d9ff, #ffcc80, #ffb74d, #ffcc80, #b3d9ff);
+            border-radius: 3px 3px 0 0;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #5a4e6e;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        .brand .jar-icon {
+            font-size: 2rem;
+            display: inline-block;
+            animation: gentleBounce 2.5s ease-in-out infinite;
+            filter: drop-shadow(0 2px 4px rgba(255, 152, 0, 0.3));
+        }
+        @keyframes gentleBounce {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            15% {
+                transform: translateY(-6px);
+            }
+            30% {
+                transform: translateY(0);
+            }
+            45% {
+                transform: translateY(-4px);
+            }
+            60% {
+                transform: translateY(0);
+            }
+        }
+        .brand-text {
+            background: linear-gradient(135deg, #7eb8da, #ff8c52);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+        .jar-count {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #e67a3c;
+            white-space: nowrap;
+            box-shadow: var(--shadow-sm);
+            letter-spacing: 0.3px;
+        }
+        .jar-count .count-num {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ff8c42;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* 主体布局 */
+        .main-content {
+            display: flex;
+            gap: 18px;
+            align-items: flex-start;
+        }
+        @media (max-width: 820px) {
+            .main-content {
+                flex-direction: column;
+            }
+            body {
+                padding: 10px;
+            }
+            .header {
+                padding: 12px 16px;
+                gap: 8px;
+            }
+            .brand {
+                font-size: 1.1rem;
+            }
+            .brand .jar-icon {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* 编辑器面板 */
+        .editor-panel {
+            flex: 1 1 58%;
+            min-width: 0;
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(179, 217, 255, 0.3);
+            transition: box-shadow var(--transition);
+        }
+        .editor-panel:focus-within {
+            box-shadow: var(--shadow-lg), 0 0 0 3px rgba(255, 183, 77, 0.12);
+        }
+        .editor-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 14px;
+            border-bottom: 1px solid #f0ecf5;
+            background: #fdfbff;
+            flex-wrap: wrap;
+        }
+        .candy-name-input {
+            flex: 1 1 140px;
+            min-width: 100px;
+            padding: 7px 12px;
+            border: 1.5px solid #e8e0f0;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-family: var(--font-sans);
+            color: var(--text);
+            background: #fefefe;
+            transition: all var(--transition);
+            outline: none;
+        }
+        .candy-name-input:focus {
+            border-color: #ffb74d;
+            box-shadow: 0 0 0 3px rgba(255, 183, 77, 0.08);
+            background: #fffdf9;
+        }
+        .candy-name-input::placeholder {
+            color: #c5bfd0;
+            font-style: italic;
+            font-size: 0.78rem;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border-radius: 16px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            transition: all var(--transition);
+            white-space: nowrap;
+            font-family: var(--font-sans);
+            line-height: 1.3;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        .btn-save {
+            background: linear-gradient(135deg, #ffb74d, #ff9800);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(255, 152, 0, 0.25);
+            font-weight: 600;
+        }
+        .btn-save:hover {
+            box-shadow: 0 4px 14px rgba(255, 152, 0, 0.38);
+            transform: translateY(-1px);
+        }
+        .btn-copy {
+            background: #f5f1fa;
+            color: #6b5e7a;
+        }
+        .btn-copy:hover {
+            background: #ede4f5;
+            color: #4a3d5c;
+        }
+        .btn-paste {
+            background: #f0f4f8;
+            color: #5a7d9a;
+        }
+        .btn-paste:hover {
+            background: #e3ecf4;
+            color: #3d5f7a;
+        }
+        .btn-preview {
+            background: linear-gradient(135deg, #b3d9ff, #7eb8da);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(126, 184, 218, 0.25);
+            font-weight: 600;
+        }
+        .btn-preview:hover {
+            box-shadow: 0 4px 14px rgba(126, 184, 218, 0.38);
+            transform: translateY(-1px);
+        }
+        .btn-new {
+            background: #fff;
+            color: #8a7d95;
+            border: 1.5px solid #e8e0f0;
+            font-weight: 500;
+        }
+        .btn-new:hover {
+            background: #fdfbff;
+            border-color: #d0c5dd;
+            color: #5a4e6e;
+        }
+        .btn-icon {
+            padding: 6px 8px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            min-width: 28px;
+            min-height: 28px;
+        }
+        .editor-wrapper {
+            flex: 1;
+            position: relative;
+            min-height: 320px;
+        }
+        .code-editor {
+            width: 100%;
+            height: 100%;
+            min-height: 320px;
+            border: none;
+            outline: none;
+            resize: none;
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
+            line-height: 1.6;
+            padding: 16px 18px;
+            background: #fdfcff;
+            color: #3e3648;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .code-editor::placeholder {
+            color: #cbc5d5;
+            font-style: italic;
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+        }
+        .code-editor::-webkit-scrollbar {
+            width: 6px;
+        }
+        .code-editor::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 3px;
+        }
+        .code-editor::-webkit-scrollbar-thumb {
+            background: #dcd4e8;
+            border-radius: 3px;
+        }
+        .code-editor::-webkit-scrollbar-thumb:hover {
+            background: #c5bcd5;
+        }
+
+        /* 糖罐面板 */
+        .jar-panel {
+            flex: 0 0 340px;
+            width: 340px;
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            max-height: 560px;
+            border: 1px solid rgba(255, 183, 77, 0.2);
+            overflow: hidden;
+        }
+        @media (max-width: 820px) {
+            .jar-panel {
+                flex: 0 0 auto;
+                width: 100%;
+                max-height: 420px;
+            }
+        }
+        .jar-panel-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f5f0f8;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            background: #fefcff;
+            flex-shrink: 0;
+        }
+        .jar-panel-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #5a4e6e;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.3px;
+        }
+        .jar-panel-title .emoji {
+            font-size: 1.2rem;
+        }
+        .jar-panel-count {
+            font-size: 0.75rem;
+            color: #a094b0;
+            background: #f8f5fb;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+        .candy-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .candy-list::-webkit-scrollbar {
+            width: 5px;
+        }
+        .candy-list::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 3px;
+        }
+        .candy-list::-webkit-scrollbar-thumb {
+            background: #e5ddf0;
+            border-radius: 3px;
+        }
+        .candy-list::-webkit-scrollbar-thumb:hover {
+            background: #d5cce2;
+        }
+        .empty-jar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            color: #c5bfd0;
+            text-align: center;
+            gap: 8px;
+            flex: 1;
+        }
+        .empty-jar .empty-icon {
+            font-size: 3.5rem;
+            opacity: 0.7;
+            animation: gentleBounce 3s ease-in-out infinite;
+        }
+        .empty-jar .empty-text {
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        .candy-item {
+            background: linear-gradient(135deg, #fefdfe, #fdf8ff, #fffaf5);
+            border-radius: var(--radius);
+            padding: 11px 13px;
+            cursor: pointer;
+            border: 1.5px solid #f0eaf5;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            box-shadow: var(--shadow-sm);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .candy-item:hover {
+            border-color: #ffcc80;
+            box-shadow: var(--shadow-md), 0 0 0 2px rgba(255, 183, 77, 0.06);
+            transform: translateX(2px);
+            background: linear-gradient(135deg, #fffefd, #fff8f2, #fef9f4);
+        }
+        .candy-item.active {
+            border-color: #ffb74d;
+            background: linear-gradient(135deg, #fffdf5, #fff8ee);
+            box-shadow: 0 0 0 3px rgba(255, 183, 77, 0.13), var(--shadow-md);
+            transform: translateX(2px);
+        }
+        .candy-item .candy-dot {
+            flex-shrink: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffb74d, #ff8c42);
+            box-shadow: 0 1px 3px rgba(255, 140, 66, 0.35);
+        }
+        .candy-item.active .candy-dot {
+            width: 12px;
+            height: 12px;
+            box-shadow: 0 2px 6px rgba(255, 140, 66, 0.5);
+            animation: pulseDot 0.8s ease-in-out;
+        }
+        @keyframes pulseDot {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.6);
+            }
+        }
+        .candy-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .candy-name {
+            font-weight: 600;
+            font-size: 0.82rem;
+            color: #4a3d5c;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            letter-spacing: 0.2px;
+        }
+        .candy-meta {
+            font-size: 0.68rem;
+            color: #b5aac5;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .candy-actions {
+            display: flex;
+            gap: 3px;
+            flex-shrink: 0;
+        }
+        .candy-actions .btn-mini {
+            padding: 4px 7px;
+            font-size: 0.68rem;
+            border-radius: 10px;
+            border: 1px solid #eae4f2;
+            background: #fdfbff;
+            color: #7a6e8a;
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: var(--font-sans);
+            letter-spacing: 0.2px;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .candy-actions .btn-mini:hover {
+            background: #f5effa;
+            border-color: #d0c5dd;
+            color: #4a3d5c;
+        }
+        .candy-actions .btn-mini.btn-del {
+            color: #c0a8b8;
+            border-color: #f5eaf0;
+        }
+        .candy-actions .btn-mini.btn-del:hover {
+            background: #fef5f7;
+            border-color: #e8c8d0;
+            color: #c97080;
+        }
+        .candy-actions .btn-mini.btn-load {
+            color: #7eb8da;
+            border-color: #e0eef8;
+        }
+        .candy-actions .btn-mini.btn-load:hover {
+            background: #f3f9fd;
+            border-color: #b3d9ff;
+            color: #5a9fc0;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+            align-items: center;
+        }
+        .toast {
+            padding: 10px 20px;
+            border-radius: 22px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            pointer-events: auto;
+            animation: toastIn 0.35s ease-out, toastOut 0.3s ease-in forwards;
+            animation-delay: 0s, 1.8s;
+            box-shadow: var(--shadow-lg);
+            font-family: var(--font-sans);
+            white-space: nowrap;
+        }
+        .toast-success {
+            background: #fff8f0;
+            color: #e67a3c;
+            border: 1.5px solid #ffe0b2;
+        }
+        .toast-info {
+            background: #f3f9fd;
+            color: #5a8faa;
+            border: 1.5px solid #cde4f5;
+        }
+        .toast-error {
+            background: #fef5f7;
+            color: #c97080;
+            border: 1.5px solid #f5dde3;
+        }
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-16px) scale(0.92);
+            }
+        }
+
+        /* 响应式微调 */
+        @media (max-width: 480px) {
+            .editor-toolbar {
+                gap: 5px;
+                padding: 8px 10px;
+            }
+            .btn {
+                padding: 5px 9px;
+                font-size: 0.72rem;
+                border-radius: 14px;
+            }
+            .candy-name-input {
+                font-size: 0.76rem;
+                padding: 6px 10px;
+            }
+            .code-editor {
+                font-size: 0.8rem;
+                padding: 12px 14px;
+                min-height: 250px;
+            }
+            .jar-panel {
+                max-height: 320px;
+            }
+            .candy-item {
+                padding: 9px 10px;
+                gap: 7px;
+            }
+            .candy-actions .btn-mini {
+                padding: 3px 6px;
+                font-size: 0.64rem;
+                border-radius: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 浮动装饰糖果 -->
+    <span class="floating-candy">🍬</span>
+    <span class="floating-candy">🍭</span>
+    <span class="floating-candy">🧁</span>
+    <span class="floating-candy">✨</span>
+
+    <!-- Toast通知容器 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- 主应用容器 -->
+    <div class="app-container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="brand">
+                <span class="jar-icon">🍯</span>
+                <span class="brand-text">YG小糖罐</span>
+            </div>
+            <div class="jar-count">
+                🍬 罐中糖果：<span class="count-num" id="candyCount">0</span> 颗
+            </div>
+        </header>
+
+        <!-- 主体 -->
+        <div class="main-content">
+            <!-- 编辑器面板 -->
+            <div class="editor-panel" id="editorPanel">
+                <div class="editor-toolbar">
+                    <input
+                    type="text"
+                    class="candy-name-input"
+                    id="candyNameInput"
+                    placeholder="🍭 给这颗糖果起个名字..."
+                    maxlength="60"
+                    >
+                    <button class="btn btn-save" id="btnSave" title="保存到糖罐 (Ctrl+S)">
+                        💾 保存
+                    </button>
+                    <button class="btn btn-copy" id="btnCopyEditor" title="复制编辑器中的代码">
+                        📋 复制
+                    </button>
+                    <button class="btn btn-paste" id="btnPaste" title="从剪切板粘贴代码">
+                        📥 粘贴
+                    </button>
+                    <button class="btn btn-preview" id="btnPreview" title="全屏预览HTML效果">
+                        🔍 预览
+                    </button>
+                    <button class="btn btn-new" id="btnNew" title="清空编辑器，创建新糖果">
+                        ✨ 新建
+                    </button>
+                </div>
+                <div class="editor-wrapper">
+                    <textarea
+                    class="code-editor"
+                    id="codeEditor"
+                    placeholder="在这里编写你的 HTML 代码...&#10;&#10;小提示：保存后会变成一颗「糖果」存入糖罐 🍬&#10;按 Ctrl+S 快速保存 | Ctrl+Enter 全屏预览"
+                    spellcheck="false"
+                ></textarea>
+            </div>
+        </div>
+
+        <!-- 糖罐面板 -->
+        <div class="jar-panel" id="jarPanel">
+            <div class="jar-panel-header">
+                <span class="jar-panel-title">
+                    <span class="emoji">🍬</span> 我的糖罐
+                </span>
+                <span class="jar-panel-count" id="jarPanelCount">0 颗糖果</span>
+            </div>
+            <div class="candy-list" id="candyList">
+                <div class="empty-jar" id="emptyJar">
+                    <span class="empty-icon">🫙</span>
+                    <span class="empty-text">糖罐空空如也~</span>
+                    <span style="font-size:0.72rem;color:#d5cee0;">写一段代码，保存你的第一颗糖果吧！</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ==================== DOM元素 ====================
+        const codeEditor = document.getElementById('codeEditor');
+        const candyNameInput = document.getElementById('candyNameInput');
+        const candyList = document.getElementById('candyList');
+        const emptyJar = document.getElementById('emptyJar');
+        const candyCountEl = document.getElementById('candyCount');
+        const jarPanelCount = document.getElementById('jarPanelCount');
+        const toastContainer = document.getElementById('toastContainer');
+        const btnSave = document.getElementById('btnSave');
+        const btnCopyEditor = document.getElementById('btnCopyEditor');
+        const btnPaste = document.getElementById('btnPaste');
+        const btnPreview = document.getElementById('btnPreview');
+        const btnNew = document.getElementById('btnNew');
+
+        // ==================== 状态 ====================
+        const STORAGE_KEY = 'yg_sugar_jar_candies';
+        let candies = []; // { id, name, code, createdAt }
+        let currentEditingId = null; // 当前编辑器中加载的糖果ID
+
+        // ==================== 初始化 ====================
+        function loadCandiesFromStorage() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    candies = JSON.parse(raw);
+                    if (!Array.isArray(candies)) candies = [];
+                } else {
+                    candies = [];
+                }
+            } catch (e) {
+                console.warn('读取存储失败，已重置糖罐', e);
+                candies = [];
+                localStorage.removeItem(STORAGE_KEY);
+            }
+        }
+
+        function saveCandiesToStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(candies));
+            } catch (e) {
+                if (e.name === 'QuotaExceededError' || e.code === 22) {
+                    showToast('糖罐满啦！请清理一些旧糖果再保存 🍬', 'error');
+                } else {
+                    showToast('保存失败，请重试 😢', 'error');
+                }
+                console.error('存储失败:', e);
+            }
+        }
+
+        function generateId() {
+            return 'candy_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+        }
+
+        function getNowISO() {
+            return new Date().toISOString();
+        }
+
+        function formatDate(isoStr) {
+            try {
+                const d = new Date(isoStr);
+                const month = d.getMonth() + 1;
+                const day = d.getDate();
+                const hour = d.getHours().toString().padStart(2, '0');
+                const min = d.getMinutes().toString().padStart(2, '0');
+                return `${month}月${day}日 ${hour}:${min}`;
+            } catch (e) {
+                return isoStr.slice(0, 16);
+            }
+        }
+
+        // ==================== Toast ====================
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            toastContainer.appendChild(toast);
+            // 自动移除（动画总时长约2.1s）
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 2200);
+        }
+
+        // ==================== 渲染糖罐列表 ====================
+        function renderCandyList() {
+            candyList.innerHTML = '';
+
+            if (candies.length === 0) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'empty-jar';
+                emptyDiv.id = 'emptyJar';
+                emptyDiv.innerHTML = `
+                        <span class="empty-icon">🫙</span>
+                        <span class="empty-text">糖罐空空如也~</span>
+                        <span style="font-size:0.72rem;color:#d5cee0;">写一段代码，保存你的第一颗糖果吧！</span>
+                    `;
+                candyList.appendChild(emptyDiv);
+            } else {
+                // 按时间倒序排列（最新的在前）
+                const sorted = [...candies].reverse();
+                sorted.forEach(candy => {
+                    const item = document.createElement('div');
+                    item.className = 'candy-item';
+                    if (candy.id === currentEditingId) {
+                        item.classList.add('active');
+                    }
+                    item.innerHTML = `
+                            <span class="candy-dot"></span>
+                            <div class="candy-info">
+                                <span class="candy-name">${escapeHTML(candy.name || '未命名糖果')}</span>
+                                <span class="candy-meta">${formatDate(candy.createdAt)} · ${countCodeLines(candy.code)}行</span>
+                            </div>
+                            <div class="candy-actions">
+                                <button class="btn-mini btn-load" data-action="load" data-id="${candy.id}" title="加载到编辑器">📝 加载</button>
+                                <button class="btn-mini" data-action="copy" data-id="${candy.id}" title="复制代码">📋</button>
+                                <button class="btn-mini" data-action="preview" data-id="${candy.id}" title="全屏预览">🔍</button>
+                                <button class="btn-mini btn-del" data-action="delete" data-id="${candy.id}" title="删除">🗑</button>
+                            </div>
+                        `;
+                    // 点击整行加载
+                    item.addEventListener('click', function(e) {
+                        // 如果点击的是按钮则不触发整行加载
+                        if (e.target.closest('button')) return;
+                        loadCandyToEditor(candy.id);
+                    });
+                    candyList.appendChild(item);
+                });
+
+                // 为所有按钮绑定事件
+                candyList.querySelectorAll('button[data-action]').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const action = this.dataset.action;
+                        const id = this.dataset.id;
+                        handleCandyAction(action, id);
+                    });
+                });
+            }
+
+            // 更新计数
+            const count = candies.length;
+            candyCountEl.textContent = count;
+            jarPanelCount.textContent = `${count} 颗糖果`;
+        }
+
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function countCodeLines(code) {
+            if (!code || code.trim() === '') return 0;
+            return code.split('\n').filter(line => line.trim().length > 0).length || code.split('\n').length;
+        }
+
+        // ==================== 糖果操作 ====================
+        function handleCandyAction(action, id) {
+            const candy = candies.find(c => c.id === id);
+            if (!candy && action !== 'delete') return;
+
+            switch (action) {
+                case 'load':
+                    loadCandyToEditor(id);
+                    break;
+                case 'copy':
+                    copyCandyCode(id);
+                    break;
+                case 'preview':
+                    previewCandyCode(id);
+                    break;
+                case 'delete':
+                    deleteCandy(id);
+                    break;
+            }
+        }
+
+        function loadCandyToEditor(id) {
+            const candy = candies.find(c => c.id === id);
+            if (!candy) return;
+            // 如果当前编辑器有未保存的内容，提示？
+            if (codeEditor.value.trim() && currentEditingId !== id) {
+                // 检查当前内容是否与已保存的糖果相同
+                const currentCandy = candies.find(c => c.id === currentEditingId);
+                const isSameAsCurrent = currentCandy && currentCandy.code === codeEditor.value;
+                const isSameAsTarget = candy.code === codeEditor.value;
+                if (!isSameAsCurrent && !isSameAsTarget && currentEditingId === null) {
+                    // 有未保存的新内容，简单提示
+                    if (!confirm('编辑器中有未保存的代码，加载新糖果将覆盖它们。确定要加载吗？')) {
+                        return;
+                    }
+                }
+                if (!isSameAsCurrent && !isSameAsTarget && currentEditingId !== null && currentEditingId !== id) {
+                    if (!confirm('你正在编辑另一颗糖果（可能有未保存的修改），加载新糖果将覆盖编辑器内容。确定要加载吗？')) {
+                        return;
+                    }
+                }
+            }
+            codeEditor.value = candy.code;
+            candyNameInput.value = candy.name || '';
+            currentEditingId = id;
+            renderCandyList();
+            codeEditor.focus();
+            showToast(`已加载糖果：「${candy.name || '未命名'}」🍬`, 'info');
+        }
+
+        function copyCandyCode(id) {
+            const candy = candies.find(c => c.id === id);
+            if (!candy) return;
+            copyToClipboard(candy.code, `已复制糖果「${candy.name || '未命名'}」的代码 📋`);
+        }
+
+        function previewCandyCode(id) {
+            const candy = candies.find(c => c.id === id);
+            if (!candy) return;
+            openFullscreenPreview(candy.code);
+        }
+
+        function deleteCandy(id) {
+            const candy = candies.find(c => c.id === id);
+            if (!candy) return;
+            if (!confirm(`确定要删除糖果「${candy.name || '未命名'}」吗？此操作不可恢复哦~ 🗑`)) {
+                return;
+            }
+            candies = candies.filter(c => c.id !== id);
+            if (currentEditingId === id) {
+                currentEditingId = null;
+                // 不清空编辑器，让用户决定是否保留内容
+            }
+            saveCandiesToStorage();
+            renderCandyList();
+            showToast(`糖果已从糖罐中移除 🗑`, 'info');
+        }
+
+        // ==================== 保存当前编辑器内容 ====================
+        function saveCurrentCode() {
+            const code = codeEditor.value;
+            const name = candyNameInput.value.trim() || generateDefaultName(code);
+
+            if (currentEditingId) {
+                // 更新现有糖果
+                const idx = candies.findIndex(c => c.id === currentEditingId);
+                if (idx >= 0) {
+                    candies[idx].code = code;
+                    candies[idx].name = name;
+                    candies[idx].createdAt = getNowISO(); // 更新时间为最后修改时间
+                    // 移到数组末尾（最新）
+                    const [updated] = candies.splice(idx, 1);
+                    candies.push(updated);
+                    saveCandiesToStorage();
+                    renderCandyList();
+                    showToast(`糖果「${name}」已更新！🍬✨`, 'success');
+                } else {
+                    // ID不存在，当作新建
+                    currentEditingId = null;
+                    saveCurrentCode();
+                    return;
+                }
+            } else {
+                // 新建糖果
+                const newCandy = {
+                    id: generateId(),
+                    name: name,
+                    code: code,
+                    createdAt: getNowISO(),
+                };
+                candies.push(newCandy);
+                currentEditingId = newCandy.id;
+                saveCandiesToStorage();
+                renderCandyList();
+                showToast(`新糖果「${name}」存入糖罐！🍬🎉`, 'success');
+            }
+            // 更新名称输入框
+            candyNameInput.value = name;
+        }
+
+        function generateDefaultName(code) {
+            if (!code || code.trim() === '') return '空糖果';
+            const trimmed = code.trim();
+            // 尝试提取title标签内容
+            const titleMatch = trimmed.match(/<title[^>]*>([^<]*)<\/title>/i);
+            if (titleMatch && titleMatch[1].trim()) {
+                return titleMatch[1].trim().slice(0, 40);
+            }
+            // 使用前几个非空字符
+            const firstLine = trimmed.split('\n')[0].replace(/<[^>]+>/g, '').trim();
+            if (firstLine && firstLine.length > 0) {
+                return firstLine.slice(0, 35) + (firstLine.length > 35 ? '...' : '');
+            }
+            return '糖果-' + new Date().toLocaleDateString('zh-CN', { month: 'short', day: 'numeric',
+                hour: '2-digit', minute: '2-digit' });
+        }
+
+        // ==================== 复制到剪切板 ====================
+        function copyToClipboard(text, successMsg) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast(successMsg || '已复制到剪切板 📋', 'success');
+                }).catch(() => {
+                    fallbackCopy(text, successMsg);
+                });
+            } else {
+                fallbackCopy(text, successMsg);
+            }
+        }
+
+        function fallbackCopy(text, successMsg) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            textarea.style.top = '-9999px';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast(successMsg || '已复制到剪切板 📋', 'success');
+                } else {
+                    showToast('复制失败，请手动选择代码后 Ctrl+C 复制', 'error');
+                }
+            } catch (e) {
+                showToast('复制失败，请手动选择代码后 Ctrl+C 复制', 'error');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // ==================== 从剪切板粘贴 ====================
+        function pasteFromClipboard() {
+            if (navigator.clipboard && navigator.clipboard.readText) {
+                navigator.clipboard.readText().then(text => {
+                    if (text && text.trim()) {
+                        insertTextAtCursor(codeEditor, text);
+                        showToast('已从剪切板粘贴代码 📥', 'info');
+                    } else {
+                        showToast('剪切板中没有文本内容哦~', 'info');
+                    }
+                }).catch(() => {
+                    showToast('无法读取剪切板，请使用 Ctrl+V 粘贴 🙏', 'error');
+                });
+            } else {
+                showToast('当前环境不支持剪切板读取，请使用 Ctrl+V 粘贴 🙏', 'error');
+            }
+        }
+
+        function insertTextAtCursor(textarea, text) {
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const before = textarea.value.substring(0, start);
+            const after = textarea.value.substring(end);
+            textarea.value = before + text + after;
+            textarea.selectionStart = textarea.selectionEnd = start + text.length;
+            textarea.focus();
+        }
+
+        // ==================== 全屏预览 ====================
+        function openFullscreenPreview(code) {
+            if (!code || code.trim() === '') {
+                showToast('代码为空，无法预览哦~ 请先编写代码 🍬', 'info');
+                return;
+            }
+            try {
+                const blob = new Blob([code], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const previewWindow = window.open(url, '_blank', 'fullscreen=yes');
+                if (!previewWindow) {
+                    showToast('预览窗口被浏览器拦截啦，请允许弹窗后重试 🔍', 'error');
+                }
+                // 延迟释放blob URL
+                setTimeout(() => {
+                    URL.revokeObjectURL(url);
+                }, 3000);
+            } catch (e) {
+                showToast('预览失败，请检查代码是否有误 😢', 'error');
+                console.error('预览错误:', e);
+            }
+        }
+
+        // ==================== 新建 ====================
+        function newCandy() {
+            if (codeEditor.value.trim() && currentEditingId === null) {
+                if (!confirm('当前编辑器中有未保存的代码，新建将清空它们。确定要新建吗？')) {
+                    return;
+                }
+            }
+            if (currentEditingId && codeEditor.value.trim()) {
+                const currentCandy = candies.find(c => c.id === currentEditingId);
+                if (currentCandy && currentCandy.code !== codeEditor.value) {
+                    if (!confirm('当前糖果有未保存的修改，新建将清空编辑器。确定要新建吗？')) {
+                        return;
+                    }
+                }
+            }
+            codeEditor.value = '';
+            candyNameInput.value = '';
+            currentEditingId = null;
+            renderCandyList();
+            codeEditor.focus();
+            showToast('已清空编辑器，开始制作新糖果吧！✨', 'info');
+        }
+
+        // ==================== 键盘快捷键 ====================
+        codeEditor.addEventListener('keydown', function(e) {
+            // Ctrl+S / Cmd+S: 保存
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveCurrentCode();
+            }
+            // Ctrl+Enter / Cmd+Enter: 预览
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                openFullscreenPreview(codeEditor.value);
+            }
+            // Tab: 插入缩进
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                const before = this.value.substring(0, start);
+                const after = this.value.substring(end);
+                const indent = '    '; // 4空格缩进
+                this.value = before + indent + after;
+                this.selectionStart = this.selectionEnd = start + indent.length;
+            }
+        });
+
+        // ==================== 按钮事件 ====================
+        btnSave.addEventListener('click', saveCurrentCode);
+        btnCopyEditor.addEventListener('click', function() {
+            const code = codeEditor.value;
+            if (!code || code.trim() === '') {
+                showToast('编辑器为空，没有什么可复制的哦~ 🍬', 'info');
+                return;
+            }
+            copyToClipboard(code, '编辑器代码已复制到剪切板 📋');
+        });
+        btnPaste.addEventListener('click', pasteFromClipboard);
+        btnPreview.addEventListener('click', function() {
+            openFullscreenPreview(codeEditor.value);
+        });
+        btnNew.addEventListener('click', newCandy);
+
+        // ==================== 名称输入框变化时自动关联 ====================
+        candyNameInput.addEventListener('input', function() {
+            // 如果正在编辑已有糖果，名称变化不会自动保存，仅用于显示
+            // 保存时会读取此输入框的值
+        });
+
+        // ==================== 初始加载 ====================
+        function init() {
+            loadCandiesFromStorage();
+            // 如果有糖果，默认加载最新一颗到编辑器
+            if (candies.length > 0) {
+                const latest = candies[candies.length - 1];
+                codeEditor.value = latest.code;
+                candyNameInput.value = latest.name || '';
+                currentEditingId = latest.id;
+            } else {
+                // 设置一个温馨的示例代码
+                codeEditor.value = `<!DOCTYPE html>
+        <html lang="zh-CN">
+        <head>
+            <meta charset="UTF-8">
+            <title>✨ 我的第一颗糖果</title>
+            <style>
+                body {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 100vh;
+                    margin: 0;
+                    background: linear-gradient(135deg, #e3f2fd, #fff3e0);
+                    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+                }
+                .candy-card {
+                    background: white;
+                    padding: 40px 50px;
+                    border-radius: 24px;
+                    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+                    text-align: center;
+                }
+                h1 { color: #ff8c52; font-size: 2rem; margin: 0 0 8px; }
+                p { color: #7a7288; font-size: 1rem; }
+                .emoji { font-size: 3rem; display: block; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+    <div class="candy-card">
+        <span class="emoji">🍬</span>
+        <h1>YG小糖罐</h1>
+        <p>你的第一颗代码糖果诞生啦！</p>
+        <p style="font-size:0.8rem;color:#b5aac5;">点击右上角「预览」查看效果</p>
+    </div>
+</body>
+</html>`;
+candyNameInput.value = '欢迎糖果';
+currentEditingId = null;
+}
+renderCandyList();
+// 聚焦编辑器
+codeEditor.focus();
+// 将光标移到末尾
+const len = codeEditor.value.length;
+codeEditor.setSelectionRange(len, len);
+}
+
+init();
+
+// ==================== 页面关闭前检查未保存内容 ====================
+window.addEventListener('beforeunload', function(e) {
+if (codeEditor.value.trim() && currentEditingId === null) {
+// 有未保存的新内容
+const msg = '你有未保存的代码，离开页面将丢失。确定要离开吗？';
+e.preventDefault();
+e.returnValue = msg;
+return msg;
+}
+if (currentEditingId) {
+const candy = candies.find(c => c.id === currentEditingId);
+if (candy && candy.code !== codeEditor.value) {
+const msg = '当前糖果有未保存的修改，离开页面将丢失。确定要离开吗？';
+e.preventDefault();
+e.returnValue = msg;
+return msg;
+}
+}
+});
+
+console.log('🍬 YG小糖罐已就绪！');
+console.log('💡 提示：Ctrl+S 保存 | Ctrl+Enter 预览 | Tab 缩进');
+console.log('🍯 糖罐中有 ' + candies.length + ' 颗糖果等待品尝~');
+})();
+</script>
+</body>
+</html>
