@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YG小糖罐 · 可编辑排序的代码糖果盒</title>
+    <title>YG小糖罐 · 可导入&预览带关闭键</title>
     <style>
         :root {
             --bg: #f5f0f8;
@@ -17,29 +17,19 @@
             --orange-deep: #ff9800;
             --orange-warm: #ff8c52;
             --text: #4a4458;
-            --text-light: #7a7288;
-            --text-lighter: #9a92a8;
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.07), 0 2px 6px rgba(0, 0, 0, 0.04);
-            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.09), 0 3px 10px rgba(0, 0, 0, 0.05);
-            --radius-sm: 8px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.07);
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.09);
             --radius: 14px;
             --radius-lg: 20px;
-            --radius-xl: 24px;
-            --font-mono: 'SF Mono', 'Cascadia Code', 'Consolas', 'Monaco', 'Menlo', 'Courier New', monospace;
-            --font-sans: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
-            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-mono: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+            --font-sans: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            --transition: 0.2s ease;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: var(--font-sans);
-            background: linear-gradient(160deg, #e8f4fd 0%, #f0e8f6 25%, #fff8f0 50%, #fef5e7 75%, #e3f2fd 100%);
+            background: linear-gradient(160deg, #e8f4fd, #f0e8f6, #fff8f0, #fef5e7, #e3f2fd);
             background-attachment: fixed;
             min-height: 100vh;
             color: var(--text);
@@ -47,763 +37,150 @@
             position: relative;
             overflow-x: hidden;
         }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: -120px;
-            right: -100px;
-            width: 380px;
-            height: 380px;
-            background: radial-gradient(circle, rgba(255, 183, 77, 0.13) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 0;
+        body::before, body::after {
+            content: ''; position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
         }
-        body::after {
-            content: '';
-            position: fixed;
-            bottom: -140px;
-            left: -90px;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(179, 217, 255, 0.16) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
+        body::before { top: -120px; right: -100px; width: 380px; height: 380px; background: radial-gradient(circle, rgba(255,183,77,0.13) 0%, transparent 70%); }
+        body::after { bottom: -140px; left: -90px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(179,217,255,0.16) 0%, transparent 70%); }
         .floating-candy {
-            position: fixed;
-            pointer-events: none;
-            z-index: 0;
-            font-size: 28px;
-            opacity: 0.5;
-            animation: floatCandy 8s ease-in-out infinite;
-            filter: blur(0.5px);
+            position: fixed; pointer-events: none; z-index: 0; font-size: 28px; opacity: 0.5;
+            animation: floatCandy 8s infinite; filter: blur(0.5px);
         }
-        .floating-candy:nth-child(1) {
-            top: 8%;
-            left: 5%;
-            animation-delay: 0s;
-            font-size: 24px;
-            opacity: 0.4;
-        }
-        .floating-candy:nth-child(2) {
-            top: 15%;
-            right: 8%;
-            animation-delay: -3s;
-            font-size: 32px;
-            opacity: 0.45;
-        }
-        .floating-candy:nth-child(3) {
-            bottom: 18%;
-            left: 10%;
-            animation-delay: -5.5s;
-            font-size: 20px;
-            opacity: 0.35;
-        }
-        .floating-candy:nth-child(4) {
-            bottom: 25%;
-            right: 12%;
-            animation-delay: -1.5s;
-            font-size: 26px;
-            opacity: 0.4;
-        }
+        .floating-candy:nth-child(1) { top:8%; left:5%; font-size:24px; opacity:0.4; }
+        .floating-candy:nth-child(2) { top:15%; right:8%; font-size:32px; opacity:0.45; }
+        .floating-candy:nth-child(3) { bottom:18%; left:10%; font-size:20px; opacity:0.35; }
+        .floating-candy:nth-child(4) { bottom:25%; right:12%; font-size:26px; opacity:0.4; }
         @keyframes floatCandy {
-            0%,
-            100% {
-                transform: translateY(0) rotate(0deg) scale(1);
-            }
-            20% {
-                transform: translateY(-18px) rotate(8deg) scale(1.08);
-            }
-            40% {
-                transform: translateY(-6px) rotate(-5deg) scale(0.94);
-            }
-            60% {
-                transform: translateY(-22px) rotate(3deg) scale(1.05);
-            }
-            80% {
-                transform: translateY(-10px) rotate(-3deg) scale(0.97);
-            }
+            0%,100% { transform: translateY(0) rotate(0deg); }
+            20% { transform: translateY(-18px) rotate(8deg); }
+            40% { transform: translateY(-6px) rotate(-5deg); }
+            60% { transform: translateY(-22px) rotate(3deg); }
+            80% { transform: translateY(-10px) rotate(-3deg); }
         }
-
-        .app-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
+        .app-container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; display: flex; flex-direction: column; gap: 18px; }
         .header {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            padding: 16px 24px;
-            box-shadow: var(--shadow-md);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            border: 1px solid rgba(255, 183, 77, 0.18);
-            position: relative;
-            overflow: hidden;
+            background: var(--card-bg); border-radius: var(--radius-lg); padding: 16px 24px;
+            box-shadow: var(--shadow-md); display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 12px; border: 1px solid rgba(255,183,77,0.18); position: relative; overflow: hidden;
         }
         .header::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #b3d9ff, #ffcc80, #ffb74d, #ffcc80, #b3d9ff);
-            border-radius: 3px 3px 0 0;
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #b3d9ff, #ffcc80, #ffb74d, #ffcc80, #b3d9ff); border-radius: 3px 3px 0 0;
         }
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.35rem;
-            font-weight: 700;
-            color: #5a4e6e;
-            letter-spacing: 0.3px;
-            white-space: nowrap;
-        }
-        .brand .jar-icon {
-            font-size: 2rem;
-            display: inline-block;
-            animation: gentleBounce 2.5s ease-in-out infinite;
-            filter: drop-shadow(0 2px 4px rgba(255, 152, 0, 0.3));
-        }
-        @keyframes gentleBounce {
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-            15% {
-                transform: translateY(-6px);
-            }
-            30% {
-                transform: translateY(0);
-            }
-            45% {
-                transform: translateY(-4px);
-            }
-            60% {
-                transform: translateY(0);
-            }
-        }
-        .brand-text {
-            background: linear-gradient(135deg, #7eb8da, #ff8c52);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-        }
-        .jar-count {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
-            padding: 7px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #e67a3c;
-            white-space: nowrap;
-            box-shadow: var(--shadow-sm);
-            letter-spacing: 0.3px;
-        }
-        .jar-count .count-num {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #ff8c42;
-            min-width: 20px;
-            text-align: center;
-        }
-
-        .main-content {
-            display: flex;
-            gap: 18px;
-            align-items: flex-start;
-        }
-        @media (max-width: 820px) {
-            .main-content {
-                flex-direction: column;
-            }
-            body {
-                padding: 10px;
-            }
-            .header {
-                padding: 12px 16px;
-                gap: 8px;
-            }
-            .brand {
-                font-size: 1.1rem;
-            }
-            .brand .jar-icon {
-                font-size: 1.5rem;
-            }
-        }
-
+        .brand { display: flex; align-items: center; gap: 10px; font-size: 1.35rem; font-weight: 700; color: #5a4e6e; }
+        .brand .jar-icon { font-size: 2rem; animation: gentleBounce 2.5s infinite; filter: drop-shadow(0 2px 4px rgba(255,152,0,0.3)); }
+        @keyframes gentleBounce { 0%,100%{ transform:translateY(0); } 15%{ transform:translateY(-6px); } 30%{ transform:translateY(0); } 45%{ transform:translateY(-4px); } 60%{ transform:translateY(0); } }
+        .brand-text { background: linear-gradient(135deg, #7eb8da, #ff8c52); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 800; }
+        .jar-count { display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #fff3e0, #ffe0b2); padding: 7px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; color: #e67a3c; }
+        .main-content { display: flex; gap: 18px; align-items: flex-start; }
+        @media (max-width: 820px) { .main-content { flex-direction: column; } body { padding: 10px; } .header { padding: 12px 16px; } }
         .editor-panel {
-            flex: 1 1 58%;
-            min-width: 0;
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            border: 1px solid rgba(179, 217, 255, 0.3);
-            transition: box-shadow var(--transition);
+            flex: 1 1 58%; min-width: 0; background: var(--card-bg); border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md); display: flex; flex-direction: column; overflow: hidden;
+            border: 1px solid rgba(179,217,255,0.3);
         }
-        .editor-panel:focus-within {
-            box-shadow: var(--shadow-lg), 0 0 0 3px rgba(255, 183, 77, 0.12);
-        }
-        .editor-toolbar {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            padding: 10px 14px;
-            border-bottom: 1px solid #f0ecf5;
-            background: #fdfbff;
-            flex-wrap: wrap;
-        }
+        .editor-panel:focus-within { box-shadow: var(--shadow-lg), 0 0 0 3px rgba(255,183,77,0.12); }
+        .editor-toolbar { display: flex; align-items: center; gap: 7px; padding: 10px 14px; border-bottom: 1px solid #f0ecf5; background: #fdfbff; flex-wrap: wrap; }
         .candy-name-input {
-            flex: 1 1 140px;
-            min-width: 100px;
-            padding: 7px 12px;
-            border: 1.5px solid #e8e0f0;
-            border-radius: 20px;
-            font-size: 0.82rem;
-            font-family: var(--font-sans);
-            color: var(--text);
-            background: #fefefe;
-            transition: all var(--transition);
-            outline: none;
+            flex:1 1 140px; min-width:100px; padding:7px 12px; border:1.5px solid #e8e0f0; border-radius:20px;
+            font-size:0.82rem; color:var(--text); background:#fefefe; outline:none;
         }
-        .candy-name-input:focus {
-            border-color: #ffb74d;
-            box-shadow: 0 0 0 3px rgba(255, 183, 77, 0.08);
-            background: #fffdf9;
-        }
-        .candy-name-input::placeholder {
-            color: #c5bfd0;
-            font-style: italic;
-            font-size: 0.78rem;
-        }
+        .candy-name-input:focus { border-color:#ffb74d; box-shadow:0 0 0 3px rgba(255,183,77,0.08); }
         .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            padding: 6px 12px;
-            border-radius: 16px;
-            border: none;
-            cursor: pointer;
-            font-size: 0.78rem;
-            font-weight: 500;
-            letter-spacing: 0.2px;
-            transition: all var(--transition);
-            white-space: nowrap;
-            font-family: var(--font-sans);
-            line-height: 1.3;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 6px 12px;
+            border-radius: 16px; border: none; cursor: pointer; font-size: 0.78rem; font-weight: 500;
+            transition: all var(--transition); white-space: nowrap; user-select: none;
         }
-        .btn:active {
-            transform: scale(0.95);
-        }
-        .btn-save {
-            background: linear-gradient(135deg, #ffb74d, #ff9800);
-            color: #fff;
-            box-shadow: 0 2px 8px rgba(255, 152, 0, 0.25);
-            font-weight: 600;
-        }
-        .btn-save:hover {
-            box-shadow: 0 4px 14px rgba(255, 152, 0, 0.38);
-            transform: translateY(-1px);
-        }
-        .btn-copy {
-            background: #f5f1fa;
-            color: #6b5e7a;
-        }
-        .btn-copy:hover {
-            background: #ede4f5;
-            color: #4a3d5c;
-        }
-        .btn-paste {
-            background: #f0f4f8;
-            color: #5a7d9a;
-        }
-        .btn-paste:hover {
-            background: #e3ecf4;
-            color: #3d5f7a;
-        }
-        .btn-preview {
-            background: linear-gradient(135deg, #b3d9ff, #7eb8da);
-            color: #fff;
-            box-shadow: 0 2px 8px rgba(126, 184, 218, 0.25);
-            font-weight: 600;
-        }
-        .btn-preview:hover {
-            box-shadow: 0 4px 14px rgba(126, 184, 218, 0.38);
-            transform: translateY(-1px);
-        }
-        .btn-new {
-            background: #fff;
-            color: #8a7d95;
-            border: 1.5px solid #e8e0f0;
-            font-weight: 500;
-        }
-        .btn-new:hover {
-            background: #fdfbff;
-            border-color: #d0c5dd;
-            color: #5a4e6e;
-        }
-        .btn-clear {
-            background: #fff5f5;
-            color: #c0848c;
-            border: 1.5px solid #f5e0e3;
-            font-weight: 500;
-        }
-        .btn-clear:hover {
-            background: #fff0f2;
-            border-color: #e8c9cf;
-            color: #b06570;
-        }
-        .btn-icon {
-            padding: 6px 8px;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            min-width: 28px;
-            min-height: 28px;
-        }
-        .editor-wrapper {
-            flex: 1;
-            position: relative;
-            min-height: 320px;
-        }
+        .btn:active { transform: scale(0.95); }
+        .btn-save { background: linear-gradient(135deg, #ffb74d, #ff9800); color:#fff; box-shadow:0 2px 8px rgba(255,152,0,0.25); }
+        .btn-copy { background:#f5f1fa; color:#6b5e7a; }
+        .btn-paste { background:#f0f4f8; color:#5a7d9a; }
+        .btn-preview { background: linear-gradient(135deg, #b3d9ff, #7eb8da); color:#fff; }
+        .btn-new { background:#fff; color:#8a7d95; border:1.5px solid #e8e0f0; }
+        .btn-clear { background:#fff5f5; color:#c0848c; border:1.5px solid #f5e0e3; }
+        .btn-import { background:#f0faf5; color:#5c8a7a; border:1.5px solid #d0eadb; }
+        .btn-import:hover { background:#e6f7ef; }
+        .editor-wrapper { flex:1; min-height:320px; }
         .code-editor {
-            width: 100%;
-            height: 100%;
-            min-height: 320px;
-            border: none;
-            outline: none;
-            resize: none;
-            font-family: var(--font-mono);
-            font-size: 0.88rem;
-            line-height: 1.6;
-            padding: 16px 18px;
-            background: #fdfcff;
-            color: #3e3648;
-            tab-size: 4;
-            -moz-tab-size: 4;
+            width:100%; height:100%; min-height:320px; border:none; outline:none; resize:none;
+            font-family:var(--font-mono); font-size:0.88rem; line-height:1.6; padding:16px 18px;
+            background:#fdfcff; color:#3e3648; tab-size:4;
         }
-        .code-editor::placeholder {
-            color: #cbc5d5;
-            font-style: italic;
-            font-family: var(--font-sans);
-            font-size: 0.85rem;
-        }
-        .code-editor::-webkit-scrollbar {
-            width: 6px;
-        }
-        .code-editor::-webkit-scrollbar-track {
-            background: transparent;
-            border-radius: 3px;
-        }
-        .code-editor::-webkit-scrollbar-thumb {
-            background: #dcd4e8;
-            border-radius: 3px;
-        }
-        .code-editor::-webkit-scrollbar-thumb:hover {
-            background: #c5bcd5;
-        }
-
         .jar-panel {
-            flex: 0 0 360px;
-            width: 360px;
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md);
-            display: flex;
-            flex-direction: column;
-            max-height: 600px;
-            border: 1px solid rgba(255, 183, 77, 0.2);
-            overflow: hidden;
+            flex:0 0 360px; width:360px; background:var(--card-bg); border-radius:var(--radius-lg);
+            box-shadow:var(--shadow-md); display:flex; flex-direction:column; max-height:600px;
+            border:1px solid rgba(255,183,77,0.2); overflow:hidden;
         }
-        @media (max-width: 820px) {
-            .jar-panel {
-                flex: 0 0 auto;
-                width: 100%;
-                max-height: 420px;
-            }
-        }
-        .jar-panel-header {
-            padding: 14px 16px;
-            border-bottom: 1px solid #f5f0f8;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            background: #fefcff;
-            flex-shrink: 0;
-        }
-        .jar-panel-title {
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: #5a4e6e;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            letter-spacing: 0.3px;
-        }
-        .jar-panel-title .emoji {
-            font-size: 1.2rem;
-        }
-        .jar-panel-count {
-            font-size: 0.75rem;
-            color: #a094b0;
-            background: #f8f5fb;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-weight: 500;
-        }
-        .candy-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .candy-list::-webkit-scrollbar {
-            width: 5px;
-        }
-        .candy-list::-webkit-scrollbar-track {
-            background: transparent;
-            border-radius: 3px;
-        }
-        .candy-list::-webkit-scrollbar-thumb {
-            background: #e5ddf0;
-            border-radius: 3px;
-        }
-        .candy-list::-webkit-scrollbar-thumb:hover {
-            background: #d5cce2;
-        }
-        .empty-jar {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
-            color: #c5bfd0;
-            text-align: center;
-            gap: 8px;
-            flex: 1;
-        }
-        .empty-jar .empty-icon {
-            font-size: 3.5rem;
-            opacity: 0.7;
-            animation: gentleBounce 3s ease-in-out infinite;
-        }
-        .empty-jar .empty-text {
-            font-size: 0.85rem;
-            font-weight: 500;
-            letter-spacing: 0.3px;
-        }
+        @media (max-width:820px) { .jar-panel { flex:0 0 auto; width:100%; max-height:420px; } }
+        .jar-panel-header { padding:14px 16px; border-bottom:1px solid #f5f0f8; display:flex; align-items:center; justify-content:space-between; background:#fefcff; }
+        .candy-list { flex:1; overflow-y:auto; padding:10px 12px; display:flex; flex-direction:column; gap:8px; }
         .candy-item {
-            background: linear-gradient(135deg, #fefdfe, #fdf8ff, #fffaf5);
-            border-radius: var(--radius);
-            padding: 11px 13px;
-            cursor: pointer;
-            border: 1.5px solid #f0eaf5;
-            transition: all var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            position: relative;
-            box-shadow: var(--shadow-sm);
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            background: linear-gradient(135deg, #fefdfe, #fdf8ff, #fffaf5); border-radius:var(--radius);
+            padding:11px 13px; cursor:pointer; border:1.5px solid #f0eaf5; transition:all var(--transition);
+            display:flex; align-items:center; gap:10px; box-shadow:var(--shadow-sm);
         }
-        .candy-item:hover {
-            border-color: #ffcc80;
-            box-shadow: var(--shadow-md), 0 0 0 2px rgba(255, 183, 77, 0.06);
-            transform: translateX(2px);
-            background: linear-gradient(135deg, #fffefd, #fff8f2, #fef9f4);
-        }
-        .candy-item.active {
-            border-color: #ffb74d;
-            background: linear-gradient(135deg, #fffdf5, #fff8ee);
-            box-shadow: 0 0 0 3px rgba(255, 183, 77, 0.13), var(--shadow-md);
-            transform: translateX(2px);
-        }
-        .candy-item .candy-dot {
-            flex-shrink: 0;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ffb74d, #ff8c42);
-            box-shadow: 0 1px 3px rgba(255, 140, 66, 0.35);
-        }
-        .candy-item.active .candy-dot {
-            width: 12px;
-            height: 12px;
-            box-shadow: 0 2px 6px rgba(255, 140, 66, 0.5);
-            animation: pulseDot 0.8s ease-in-out;
-        }
-        @keyframes pulseDot {
-            0%,
-            100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.6);
-            }
-        }
-        .candy-info {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .candy-name {
-            font-weight: 600;
-            font-size: 0.82rem;
-            color: #4a3d5c;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            letter-spacing: 0.2px;
-        }
-        .candy-meta {
-            font-size: 0.68rem;
-            color: #b5aac5;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .candy-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 3px;
-            flex-shrink: 0;
-            align-items: center;
-        }
-        .candy-actions .btn-mini {
-            padding: 4px 7px;
-            font-size: 0.68rem;
-            border-radius: 10px;
-            border: 1px solid #eae4f2;
-            background: #fdfbff;
-            color: #7a6e8a;
-            cursor: pointer;
-            transition: all var(--transition);
-            font-family: var(--font-sans);
-            letter-spacing: 0.2px;
-            white-space: nowrap;
-            -webkit-tap-highlight-color: transparent;
-            line-height: 1.2;
-        }
-        .candy-actions .btn-mini:hover {
-            background: #f5effa;
-            border-color: #d0c5dd;
-            color: #4a3d5c;
-        }
-        .candy-actions .btn-mini.btn-del {
-            color: #c0a8b8;
-            border-color: #f5eaf0;
-        }
-        .candy-actions .btn-mini.btn-del:hover {
-            background: #fef5f7;
-            border-color: #e8c8d0;
-            color: #c97080;
-        }
-        .candy-actions .btn-mini.btn-load {
-            color: #7eb8da;
-            border-color: #e0eef8;
-        }
-        .candy-actions .btn-mini.btn-load:hover {
-            background: #f3f9fd;
-            border-color: #b3d9ff;
-            color: #5a9fc0;
-        }
-        /* 移动与编辑按钮更紧凑 */
-        .candy-actions .btn-mini.btn-move {
-            padding: 3px 5px;
-            font-size: 0.7rem;
-        }
-
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            pointer-events: none;
-            align-items: center;
-        }
+        .candy-item:hover { border-color:#ffcc80; transform:translateX(2px); }
+        .candy-item.active { border-color:#ffb74d; background:linear-gradient(135deg, #fffdf5, #fff8ee); }
+        .candy-dot { width:10px; height:10px; border-radius:50%; background:linear-gradient(135deg, #ffb74d, #ff8c42); }
+        .candy-info { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+        .candy-name { font-weight:600; font-size:0.82rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .candy-meta { font-size:0.68rem; color:#b5aac5; }
+        .candy-actions { display:flex; flex-wrap:wrap; gap:3px; }
+        .btn-mini { padding:4px 7px; font-size:0.68rem; border-radius:10px; border:1px solid #eae4f2; background:#fdfbff; cursor:pointer; }
+        .btn-move { padding:3px 5px; }
+        .toast-container { position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:9999; display:flex; flex-direction:column; gap:8px; }
         .toast {
-            padding: 10px 20px;
-            border-radius: 22px;
-            font-size: 0.82rem;
-            font-weight: 500;
-            letter-spacing: 0.3px;
-            pointer-events: auto;
-            animation: toastIn 0.35s ease-out, toastOut 0.3s ease-in forwards;
-            animation-delay: 0s, 1.8s;
-            box-shadow: var(--shadow-lg);
-            font-family: var(--font-sans);
-            white-space: nowrap;
+            padding:10px 20px; border-radius:22px; font-size:0.82rem; animation: toastIn 0.35s, toastOut 0.3s forwards;
+            animation-delay:0s, 1.8s; box-shadow:var(--shadow-lg);
         }
-        .toast-success {
-            background: #fff8f0;
-            color: #e67a3c;
-            border: 1.5px solid #ffe0b2;
-        }
-        .toast-info {
-            background: #f3f9fd;
-            color: #5a8faa;
-            border: 1.5px solid #cde4f5;
-        }
-        .toast-error {
-            background: #fef5f7;
-            color: #c97080;
-            border: 1.5px solid #f5dde3;
-        }
-        @keyframes toastIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px) scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-        @keyframes toastOut {
-            from {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-            to {
-                opacity: 0;
-                transform: translateY(-16px) scale(0.92);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .editor-toolbar {
-                gap: 5px;
-                padding: 8px 10px;
-            }
-            .btn {
-                padding: 5px 9px;
-                font-size: 0.72rem;
-                border-radius: 14px;
-            }
-            .candy-name-input {
-                font-size: 0.76rem;
-                padding: 6px 10px;
-            }
-            .code-editor {
-                font-size: 0.8rem;
-                padding: 12px 14px;
-                min-height: 250px;
-            }
-            .jar-panel {
-                max-height: 320px;
-            }
-            .candy-item {
-                padding: 9px 10px;
-                gap: 7px;
-            }
-            .candy-actions .btn-mini {
-                padding: 3px 6px;
-                font-size: 0.64rem;
-                border-radius: 8px;
-            }
-        }
+        .toast-success { background:#fff8f0; color:#e67a3c; border:1.5px solid #ffe0b2; }
+        .toast-info { background:#f3f9fd; color:#5a8faa; border:1.5px solid #cde4f5; }
+        @keyframes toastIn { from{ opacity:0; transform:translateY(-20px); } to{ opacity:1; transform:translateY(0); } }
+        @keyframes toastOut { from{ opacity:1; transform:translateY(0); } to{ opacity:0; transform:translateY(-16px); } }
     </style>
 </head>
 <body>
-
     <span class="floating-candy">🍬</span>
     <span class="floating-candy">🍭</span>
     <span class="floating-candy">🧁</span>
     <span class="floating-candy">✨</span>
-
     <div class="toast-container" id="toastContainer"></div>
 
     <div class="app-container">
         <header class="header">
-            <div class="brand">
-                <span class="jar-icon">🍯</span>
-                <span class="brand-text">YG小糖罐</span>
-            </div>
-            <div class="jar-count">
-                🍬 罐中糖果：<span class="count-num" id="candyCount">0</span> 颗
-            </div>
+            <div class="brand"><span class="jar-icon">🍯</span><span class="brand-text">YG小糖罐</span></div>
+            <div class="jar-count">🍬 罐中糖果：<span class="count-num" id="candyCount">0</span> 颗</div>
         </header>
-
         <div class="main-content">
-            <div class="editor-panel" id="editorPanel">
+            <div class="editor-panel">
                 <div class="editor-toolbar">
-                    <input
-                    type="text"
-                    class="candy-name-input"
-                    id="candyNameInput"
-                    placeholder="🍭 给这颗糖果起个名字..."
-                    maxlength="60"
-                    >
-                    <button class="btn btn-save" id="btnSave" title="保存到糖罐 (Ctrl+S)">💾 保存</button>
-                    <button class="btn btn-copy" id="btnCopyEditor" title="复制编辑器中的代码">📋 复制</button>
-                    <button class="btn btn-paste" id="btnPaste" title="从剪切板粘贴代码">📥 粘贴</button>
-                    <button class="btn btn-preview" id="btnPreview" title="全屏预览HTML效果">🔍 预览</button>
-                    <button class="btn btn-clear" id="btnClear" title="清空编辑器内容（不保存）">🧹 清空</button>
-                    <button class="btn btn-new" id="btnNew" title="新建糖果（清空并创建新糖果）">✨ 新建</button>
+                    <input type="text" class="candy-name-input" id="candyNameInput" placeholder="🍭 糖果名字..." maxlength="60">
+                    <button class="btn btn-save" id="btnSave">💾 保存</button>
+                    <button class="btn btn-copy" id="btnCopyEditor">📋 复制</button>
+                    <button class="btn btn-paste" id="btnPaste">📥 粘贴</button>
+                    <button class="btn btn-preview" id="btnPreview">🔍 预览</button>
+                    <!-- 新增导入按钮 -->
+                    <button class="btn btn-import" id="btnImport">📂 导入</button>
+                    <button class="btn btn-clear" id="btnClear">🧹 清空</button>
+                    <button class="btn btn-new" id="btnNew">✨ 新建</button>
                 </div>
                 <div class="editor-wrapper">
-                    <textarea
-                    class="code-editor"
-                    id="codeEditor"
-                    placeholder="在这里编写你的 HTML 代码...&#10;&#10;小提示：保存后会变成一颗「糖果」存入糖罐 🍬&#10;按 Ctrl+S 快速保存 | Ctrl+Enter 全屏预览"
-                    spellcheck="false"
-                ></textarea>
-            </div>
-        </div>
-
-        <div class="jar-panel" id="jarPanel">
-            <div class="jar-panel-header">
-                <span class="jar-panel-title">
-                    <span class="emoji">🍬</span> 我的糖罐
-                </span>
-                <span class="jar-panel-count" id="jarPanelCount">0 颗糖果</span>
-            </div>
-            <div class="candy-list" id="candyList">
-                <div class="empty-jar" id="emptyJar">
-                    <span class="empty-icon">🫙</span>
-                    <span class="empty-text">糖罐空空如也~</span>
-                    <span style="font-size:0.72rem;color:#d5cee0;">写一段代码，保存你的第一颗糖果吧！</span>
+                    <textarea class="code-editor" id="codeEditor" placeholder="在这里写 HTML 代码...&#10;Ctrl+S 保存 | Ctrl+Enter 预览 | Tab 缩进" spellcheck="false"></textarea>
                 </div>
+            </div>
+            <div class="jar-panel">
+                <div class="jar-panel-header">
+                    <span>🍬 我的糖罐</span>
+                    <span class="jar-panel-count" id="jarPanelCount">0 颗</span>
+                </div>
+                <div class="candy-list" id="candyList"></div>
             </div>
         </div>
     </div>
-</div>
+    <!-- 隐藏的文件选择器，用于导入HTML -->
+    <input type="file" id="fileInput" accept=".html,.htm" style="display:none">
 
-<script>
+    <script>
     (function() {
         const codeEditor = document.getElementById('codeEditor');
         const candyNameInput = document.getElementById('candyNameInput');
@@ -811,521 +188,235 @@
         const candyCountEl = document.getElementById('candyCount');
         const jarPanelCount = document.getElementById('jarPanelCount');
         const toastContainer = document.getElementById('toastContainer');
-        const btnSave = document.getElementById('btnSave');
-        const btnCopyEditor = document.getElementById('btnCopyEditor');
-        const btnPaste = document.getElementById('btnPaste');
-        const btnPreview = document.getElementById('btnPreview');
-        const btnNew = document.getElementById('btnNew');
-        const btnClear = document.getElementById('btnClear');
-
+        const fileInput = document.getElementById('fileInput');
         const STORAGE_KEY = 'yg_sugar_jar_candies';
-        let candies = []; // 存储顺序：越靠后越新（显示时reverse，即最新的在最上面）
+        let candies = [];
         let currentEditingId = null;
 
-        function loadCandiesFromStorage() {
+        function loadCandies() {
             try {
                 const raw = localStorage.getItem(STORAGE_KEY);
-                if (raw) {
-                    candies = JSON.parse(raw);
-                    if (!Array.isArray(candies)) candies = [];
-                } else {
-                    candies = [];
-                }
-            } catch (e) {
-                console.warn('读取存储失败', e);
-                candies = [];
-                localStorage.removeItem(STORAGE_KEY);
-            }
+                candies = raw ? JSON.parse(raw) : [];
+                if (!Array.isArray(candies)) candies = [];
+            } catch (e) { candies = []; }
         }
-
-        function saveCandiesToStorage() {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(candies));
-            } catch (e) {
-                if (e.name === 'QuotaExceededError' || e.code === 22) {
-                    showToast('糖罐满啦！请清理一些旧糖果再保存 🍬', 'error');
-                } else {
-                    showToast('保存失败，请重试 😢', 'error');
-                }
-            }
+        function saveCandies() { localStorage.setItem(STORAGE_KEY, JSON.stringify(candies)); }
+        function showToast(msg, type='info') {
+            const t = document.createElement('div'); t.className = `toast toast-${type}`; t.textContent = msg;
+            toastContainer.appendChild(t); setTimeout(() => t.remove(), 2200);
         }
+        function escapeHTML(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
-        function generateId() {
-            return 'candy_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-        }
-
-        function getNowISO() {
-            return new Date().toISOString();
-        }
-
-        function formatDate(isoStr) {
-            try {
-                const d = new Date(isoStr);
-                return `${d.getMonth()+1}月${d.getDate()}日 ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
-            } catch (e) {
-                return isoStr.slice(0, 16);
-            }
-        }
-
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.textContent = message;
-            toastContainer.appendChild(toast);
-            setTimeout(() => {
-                if (toast.parentNode) toast.remove();
-            }, 2200);
-        }
-
-        function escapeHTML(str) {
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
-        }
-
-        function countCodeLines(code) {
-            if (!code || code.trim() === '') return 0;
-            return code.split('\n').filter(line => line.trim().length > 0).length || code.split('\n').length;
-        }
-
-        // 渲染糖罐列表（含移动、编辑按钮）
         function renderCandyList() {
             candyList.innerHTML = '';
-            if (candies.length === 0) {
-                const emptyDiv = document.createElement('div');
-                emptyDiv.className = 'empty-jar';
-                emptyDiv.id = 'emptyJar';
-                emptyDiv.innerHTML = `
-                    <span class="empty-icon">🫙</span>
-                    <span class="empty-text">糖罐空空如也~</span>
-                    <span style="font-size:0.72rem;color:#d5cee0;">写一段代码，保存你的第一颗糖果吧！</span>
-                `;
-                candyList.appendChild(emptyDiv);
+            if (!candies.length) {
+                candyList.innerHTML = '<div class="empty-jar" style="text-align:center;padding:40px;color:#c5bfd0;">🫙 糖罐空空~</div>';
             } else {
-                const sorted = [...candies].reverse(); // 最新在前显示
-                sorted.forEach((candy, displayIdx) => {
-                    const item = document.createElement('div');
-                    item.className = 'candy-item';
-                    if (candy.id === currentEditingId) item.classList.add('active');
-
-                    // 上移下移按钮：只有多于1颗时才有效，但始终渲染
-                    const isFirst = displayIdx === 0;
-                    const isLast = displayIdx === sorted.length - 1;
-                    const moveUpDisabled = isFirst ? 'disabled' : '';
-                    const moveDownDisabled = isLast ? 'disabled' : '';
-
-                    item.innerHTML = `
+                [...candies].reverse().forEach((c, i) => {
+                    const div = document.createElement('div');
+                    div.className = `candy-item${c.id === currentEditingId ? ' active' : ''}`;
+                    const isFirst = i === 0, isLast = i === candies.length - 1;
+                    div.innerHTML = `
                         <span class="candy-dot"></span>
                         <div class="candy-info">
-                            <span class="candy-name">${escapeHTML(candy.name || '未命名糖果')}</span>
-                            <span class="candy-meta">${formatDate(candy.createdAt)} · ${countCodeLines(candy.code)}行</span>
+                            <span class="candy-name">${escapeHTML(c.name||'未命名')}</span>
+                            <span class="candy-meta">${new Date(c.createdAt).toLocaleString()}</span>
                         </div>
                         <div class="candy-actions">
-                            <button class="btn-mini btn-load" data-action="load" data-id="${candy.id}" title="加载到编辑器">📝</button>
-                            <button class="btn-mini" data-action="copy" data-id="${candy.id}" title="复制代码">📋</button>
-                            <button class="btn-mini" data-action="preview" data-id="${candy.id}" title="全屏预览">🔍</button>
-                            <button class="btn-mini btn-del" data-action="delete" data-id="${candy.id}" title="删除">🗑</button>
-                            <button class="btn-mini" data-action="editName" data-id="${candy.id}" title="编辑名称">✏️</button>
-                            <button class="btn-mini btn-move" data-action="moveUp" data-id="${candy.id}" title="上移" ${moveUpDisabled}>⬆️</button>
-                            <button class="btn-mini btn-move" data-action="moveDown" data-id="${candy.id}" title="下移" ${moveDownDisabled}>⬇️</button>
-                        </div>
-                    `;
-
-                    // 整行点击：加载或取消选择
-                    item.addEventListener('click', function(e) {
+                            <button class="btn-mini" data-action="load" data-id="${c.id}">📝</button>
+                            <button class="btn-mini" data-action="copy" data-id="${c.id}">📋</button>
+                            <button class="btn-mini" data-action="preview" data-id="${c.id}">🔍</button>
+                            <button class="btn-mini" data-action="delete" data-id="${c.id}">🗑</button>
+                            <button class="btn-mini" data-action="editName" data-id="${c.id}">✏️</button>
+                            <button class="btn-mini btn-move" data-action="moveUp" data-id="${c.id}" ${isFirst?'disabled':''}>⬆️</button>
+                            <button class="btn-mini btn-move" data-action="moveDown" data-id="${c.id}" ${isLast?'disabled':''}>⬇️</button>
+                        </div>`;
+                    div.addEventListener('click', e => {
                         if (e.target.closest('button')) return;
-                        if (candy.id === currentEditingId) {
-                            // 再次点击已激活糖果 → 取消选择
-                            deselectCandy();
-                        } else {
-                            loadCandyToEditor(candy.id);
-                        }
+                        if (c.id === currentEditingId) deselectCandy();
+                        else loadCandyToEditor(c.id);
                     });
-
-                    // 所有按钮事件委托
-                    item.querySelectorAll('button[data-action]').forEach(btn => {
-                        btn.addEventListener('click', function(e) {
-                            e.stopPropagation();
-                            const action = this.dataset.action;
-                            const id = this.dataset.id;
-                            handleCandyAction(action, id);
-                        });
-                    });
-
-                    candyList.appendChild(item);
+                    candyList.appendChild(div);
                 });
             }
-
-            const count = candies.length;
-            candyCountEl.textContent = count;
-            jarPanelCount.textContent = `${count} 颗糖果`;
-        }
-
-        // 糖果操作分发
-        function handleCandyAction(action, id) {
-            switch (action) {
-                case 'load': loadCandyToEditor(id); break;
-                case 'copy': copyCandyCode(id); break;
-                case 'preview': previewCandyCode(id); break;
-                case 'delete': deleteCandy(id); break;
-                case 'editName': editCandyName(id); break;
-                case 'moveUp': moveCandyUp(id); break;
-                case 'moveDown': moveCandyDown(id); break;
-            }
+            candyCountEl.textContent = candies.length;
+            jarPanelCount.textContent = candies.length + ' 颗';
         }
 
         function loadCandyToEditor(id) {
             const candy = candies.find(c => c.id === id);
             if (!candy) return;
-            // 如果编辑器中有未保存内容且不是当前正在编辑的糖果，提示
-            if (codeEditor.value.trim() && currentEditingId !== id) {
-                const currentCandy = candies.find(c => c.id === currentEditingId);
-                const isSameAsCurrent = currentCandy && currentCandy.code === codeEditor.value;
-                const isSameAsTarget = candy.code === codeEditor.value;
-                if (!isSameAsCurrent && !isSameAsTarget && currentEditingId === null) {
-                    if (!confirm('编辑器中有未保存的代码，加载新糖果将覆盖它们。确定要加载吗？')) return;
-                }
-                if (!isSameAsCurrent && !isSameAsTarget && currentEditingId !== null && currentEditingId !== id) {
-                    if (!confirm('你正在编辑另一颗糖果（可能有未保存的修改），加载新糖果将覆盖编辑器内容。确定要加载吗？')) return;
-                }
-            }
+            if (codeEditor.value.trim() && currentEditingId !== id && !confirm('覆盖当前未保存的代码？')) return;
             codeEditor.value = candy.code;
             candyNameInput.value = candy.name || '';
             currentEditingId = id;
             renderCandyList();
             codeEditor.focus();
-            showToast(`已加载糖果：「${candy.name || '未命名'}」🍬`, 'info');
         }
 
-        // 取消选择糖果
         function deselectCandy() {
-            codeEditor.value = '';
-            candyNameInput.value = '';
-            currentEditingId = null;
-            renderCandyList();
-            showToast('已取消选择糖果，编辑器已清空', 'info');
-            codeEditor.focus();
+            codeEditor.value = ''; candyNameInput.value = ''; currentEditingId = null;
+            renderCandyList(); showToast('已取消选择', 'info');
         }
 
-        function copyCandyCode(id) {
+        function handleAction(action, id) {
             const candy = candies.find(c => c.id === id);
-            if (!candy) return;
-            copyToClipboard(candy.code, `已复制糖果「${candy.name || '未命名'}」的代码 📋`);
-        }
-
-        function previewCandyCode(id) {
-            const candy = candies.find(c => c.id === id);
-            if (!candy) return;
-            openFullscreenPreview(candy.code);
-        }
-
-        function deleteCandy(id) {
-            const candy = candies.find(c => c.id === id);
-            if (!candy) return;
-            if (!confirm(`确定要删除糖果「${candy.name || '未命名'}」吗？此操作不可恢复哦~ 🗑`)) return;
-            candies = candies.filter(c => c.id !== id);
-            if (currentEditingId === id) {
-                currentEditingId = null;
-            }
-            saveCandiesToStorage();
-            renderCandyList();
-            showToast('糖果已从糖罐中移除 🗑', 'info');
-        }
-
-        // 编辑糖果名称
-        function editCandyName(id) {
-            const candy = candies.find(c => c.id === id);
-            if (!candy) return;
-            const newName = prompt('请输入新的糖果名称', candy.name || '未命名糖果');
-            if (newName !== null && newName.trim() !== '') {
-                candy.name = newName.trim();
-                saveCandiesToStorage();
-                renderCandyList();
-                // 如果正在编辑这个糖果，同步更新名称输入框
-                if (currentEditingId === id) {
-                    candyNameInput.value = candy.name;
-                }
-                showToast('糖果名称已更新 ✏️', 'success');
-            } else if (newName !== null && newName.trim() === '') {
-                showToast('名称不能为空哦~', 'error');
+            if (!candy && action !== 'delete') return;
+            switch (action) {
+                case 'load': loadCandyToEditor(id); break;
+                case 'copy': copyToClipboard(candy.code, '已复制'); break;
+                case 'preview': openPreview(candy.code); break;
+                case 'delete':
+                    if (confirm('删除这颗糖果？')) {
+                        candies = candies.filter(c => c.id !== id);
+                        if (currentEditingId === id) currentEditingId = null;
+                        saveCandies(); renderCandyList(); showToast('已删除');
+                    }
+                    break;
+                case 'editName':
+                    const newName = prompt('新名称', candy.name);
+                    if (newName && newName.trim()) { candy.name = newName.trim(); saveCandies(); renderCandyList(); if(currentEditingId===id) candyNameInput.value = candy.name; }
+                    break;
+                case 'moveUp': moveCandy(id, 'up'); break;
+                case 'moveDown': moveCandy(id, 'down'); break;
             }
         }
 
-        // 上移糖果（显示位置向上移动，即与上一个糖果交换位置）
-        function moveCandyUp(id) {
-            const idx = candies.findIndex(c => c.id === id);
-            if (idx === -1) return;
-            // 显示索引 = 总长度 - 1 - 原始索引
-            const displayIdx = candies.length - 1 - idx;
-            if (displayIdx <= 0) return; // 已经在最顶部
-            // 需要与显示中前一个糖果（displayIdx-1）交换，其原始索引为 len - displayIdx
-            const swapIdx = candies.length - displayIdx;
-            [candies[idx], candies[swapIdx]] = [candies[swapIdx], candies[idx]];
-            saveCandiesToStorage();
-            renderCandyList();
-            showToast('糖果顺序已更新 ⬆️', 'info');
-        }
-
-        // 下移糖果
-        function moveCandyDown(id) {
+        function moveCandy(id, dir) {
             const idx = candies.findIndex(c => c.id === id);
             if (idx === -1) return;
             const displayIdx = candies.length - 1 - idx;
-            if (displayIdx >= candies.length - 1) return; // 已经在最底部
-            // 与显示中后一个糖果（displayIdx+1）交换，其原始索引为 len - 2 - displayIdx
-            const swapIdx = candies.length - 2 - displayIdx;
+            if (dir === 'up' && displayIdx <= 0) return;
+            if (dir === 'down' && displayIdx >= candies.length - 1) return;
+            const swapIdx = dir === 'up' ? candies.length - displayIdx : candies.length - 2 - displayIdx;
             [candies[idx], candies[swapIdx]] = [candies[swapIdx], candies[idx]];
-            saveCandiesToStorage();
-            renderCandyList();
-            showToast('糖果顺序已更新 ⬇️', 'info');
+            saveCandies(); renderCandyList(); showToast('顺序已调整');
         }
 
         function saveCurrentCode() {
-            const code = codeEditor.value;
-            const name = candyNameInput.value.trim() || generateDefaultName(code);
+            const code = codeEditor.value, name = candyNameInput.value.trim() || '未命名';
             if (currentEditingId) {
                 const idx = candies.findIndex(c => c.id === currentEditingId);
                 if (idx >= 0) {
-                    candies[idx].code = code;
-                    candies[idx].name = name;
-                    candies[idx].createdAt = getNowISO();
-                    const [updated] = candies.splice(idx, 1);
-                    candies.push(updated); // 更新后放到末尾（最新）
-                    saveCandiesToStorage();
-                    renderCandyList();
-                    showToast(`糖果「${name}」已更新！🍬✨`, 'success');
-                } else {
-                    currentEditingId = null;
-                    saveCurrentCode();
-                    return;
+                    candies[idx].code = code; candies[idx].name = name; candies[idx].createdAt = new Date().toISOString();
+                    const [upd] = candies.splice(idx, 1); candies.push(upd);
+                    saveCandies(); renderCandyList(); showToast('已更新');
                 }
             } else {
-                const newCandy = {
-                    id: generateId(),
-                    name: name,
-                    code: code,
-                    createdAt: getNowISO(),
-                };
-                candies.push(newCandy);
-                currentEditingId = newCandy.id;
-                saveCandiesToStorage();
-                renderCandyList();
-                showToast(`新糖果「${name}」存入糖罐！🍬🎉`, 'success');
+                const newCandy = { id: 'candy_'+Date.now()+Math.random().toString(36).slice(2), name, code, createdAt: new Date().toISOString() };
+                candies.push(newCandy); currentEditingId = newCandy.id;
+                saveCandies(); renderCandyList(); showToast('新糖果已保存');
             }
             candyNameInput.value = name;
         }
 
-        function generateDefaultName(code) {
-            if (!code || code.trim() === '') return '空糖果';
-            const trimmed = code.trim();
-            const titleMatch = trimmed.match(/<title[^>]*>([^<]*)<\/title>/i);
-            if (titleMatch && titleMatch[1].trim()) return titleMatch[1].trim().slice(0, 40);
-            const firstLine = trimmed.split('\n')[0].replace(/<[^>]+>/g, '').trim();
-            if (firstLine && firstLine.length > 0) return firstLine.slice(0, 35) + (firstLine.length > 35 ? '...' : '');
-            return '糖果-' + new Date().toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-        }
-
-        function copyToClipboard(text, successMsg) {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => showToast(successMsg, 'success')).catch(() => fallbackCopy(text, successMsg));
-            } else {
-                fallbackCopy(text, successMsg);
+        function copyToClipboard(text, msg) {
+            if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => showToast(msg));
+            else {
+                const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
+                document.execCommand('copy'); document.body.removeChild(ta); showToast(msg);
             }
         }
 
-        function fallbackCopy(text, successMsg) {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            textarea.style.position = 'fixed';
-            textarea.style.left = '-9999px';
-            textarea.style.top = '-9999px';
-            textarea.style.opacity = '0';
-            document.body.appendChild(textarea);
-            textarea.focus();
-            textarea.select();
-            try {
-                if (document.execCommand('copy')) showToast(successMsg, 'success');
-                else showToast('复制失败，请手动复制', 'error');
-            } catch (e) {
-                showToast('复制失败，请手动复制', 'error');
-            }
-            document.body.removeChild(textarea);
+        function openPreview(code) {
+            if (!code.trim()) { showToast('代码为空'); return; }
+            const blob = new Blob([code], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const win = window.open('', '_blank');
+            if (!win) { showToast('请允许弹窗'); URL.revokeObjectURL(url); return; }
+            win.document.write(`
+                <!DOCTYPE html><html><head><meta charset="UTF-8"><title>预览</title>
+                <style>
+                    body,html{ margin:0; padding:0; height:100%; overflow:hidden; }
+                    #__yg_close_bar{ position:fixed; top:10px; right:10px; z-index:99999; background:rgba(255,255,255,0.9);
+                        padding:6px 14px; border-radius:20px; box-shadow:0 2px 12px rgba(0,0,0,0.15); display:flex; align-items:center; gap:6px;
+                        font-family:system-ui; font-size:14px; color:#333; }
+                    #__yg_close_bar button{ background:#ff8c52; border:none; color:white; padding:5px 14px; border-radius:14px;
+                        cursor:pointer; font-weight:600; }
+                    iframe{ width:100%; height:100%; border:none; }
+                </style></head><body>
+                <div id="__yg_close_bar"><span>🍬 预览</span><button onclick="window.close()">✕ 关闭</button></div>
+                <iframe src="${url}" sandbox="allow-scripts allow-same-origin allow-forms allow-modals"></iframe>
+                </body></html>
+            `);
+            win.document.close();
+            const timer = setInterval(() => { if (win.closed) { URL.revokeObjectURL(url); clearInterval(timer); } }, 1000);
         }
 
-        function pasteFromClipboard() {
-            if (navigator.clipboard && navigator.clipboard.readText) {
-                navigator.clipboard.readText().then(text => {
-                    if (text && text.trim()) {
-                        insertTextAtCursor(codeEditor, text);
-                        showToast('已从剪切板粘贴代码 📥', 'info');
-                    } else {
-                        showToast('剪切板中没有文本内容哦~', 'info');
-                    }
-                }).catch(() => showToast('无法读取剪切板，请使用 Ctrl+V 粘贴 🙏', 'error'));
-            } else {
-                showToast('当前环境不支持剪切板读取，请使用 Ctrl+V 粘贴 🙏', 'error');
-            }
+        function importFile() {
+            fileInput.click();
         }
 
-        function insertTextAtCursor(textarea, text) {
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            textarea.value = textarea.value.substring(0, start) + text + textarea.value.substring(end);
-            textarea.selectionStart = textarea.selectionEnd = start + text.length;
-            textarea.focus();
-        }
-
-        function openFullscreenPreview(code) {
-            if (!code || code.trim() === '') {
-                showToast('代码为空，无法预览哦~ 请先编写代码 🍬', 'info');
-                return;
+        fileInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+            if (!file.name.endsWith('.html') && !file.name.endsWith('.htm')) {
+                showToast('请选择 .html 文件', 'error'); return;
             }
-            try {
-                const blob = new Blob([code], { type: 'text/html;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const previewWindow = window.open(url, '_blank', 'fullscreen=yes');
-                if (!previewWindow) showToast('预览窗口被浏览器拦截啦，请允许弹窗后重试 🔍', 'error');
-                setTimeout(() => URL.revokeObjectURL(url), 3000);
-            } catch (e) {
-                showToast('预览失败，请检查代码是否有误 😢', 'error');
-            }
-        }
-
-        function clearEditor() {
-            codeEditor.value = '';
-            candyNameInput.value = '';
-            currentEditingId = null;
-            renderCandyList();
-            codeEditor.focus();
-        }
-
-        function newCandy() {
-            if (codeEditor.value.trim() && currentEditingId === null) {
-                if (!confirm('当前编辑器中有未保存的代码，新建将清空它们。确定要新建吗？')) return;
-            }
-            if (currentEditingId && codeEditor.value.trim()) {
-                const currentCandy = candies.find(c => c.id === currentEditingId);
-                if (currentCandy && currentCandy.code !== codeEditor.value) {
-                    if (!confirm('当前糖果有未保存的修改，新建将清空编辑器。确定要新建吗？')) return;
-                }
-            }
-            clearEditor();
-            showToast('已清空编辑器，开始制作新糖果吧！✨', 'info');
-        }
-
-        // 快捷键
-        codeEditor.addEventListener('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                e.preventDefault();
-                saveCurrentCode();
-            }
-            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                e.preventDefault();
-                openFullscreenPreview(codeEditor.value);
-            }
-            if (e.key === 'Tab') {
-                e.preventDefault();
-                const start = this.selectionStart;
-                const end = this.selectionEnd;
-                this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
-                this.selectionStart = this.selectionEnd = start + 4;
-            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                codeEditor.value = e.target.result;
+                candyNameInput.value = file.name.replace(/\.html?$/i, '');
+                currentEditingId = null;
+                renderCandyList();
+                showToast('已导入 ' + file.name, 'success');
+                codeEditor.focus();
+            };
+            reader.readAsText(file, 'UTF-8');
+            this.value = ''; // 允许重复选择同一个文件
         });
 
         // 按钮绑定
-        btnSave.addEventListener('click', saveCurrentCode);
-        btnCopyEditor.addEventListener('click', () => {
-            if (!codeEditor.value.trim()) return showToast('编辑器为空，没有什么可复制的哦~ 🍬', 'info');
-            copyToClipboard(codeEditor.value, '编辑器代码已复制到剪切板 📋');
+        document.getElementById('btnSave').addEventListener('click', saveCurrentCode);
+        document.getElementById('btnCopyEditor').addEventListener('click', () => {
+            if (codeEditor.value.trim()) copyToClipboard(codeEditor.value, '已复制编辑器代码');
+            else showToast('编辑器为空');
         });
-        btnPaste.addEventListener('click', pasteFromClipboard);
-        btnPreview.addEventListener('click', () => openFullscreenPreview(codeEditor.value));
-        btnClear.addEventListener('click', () => {
-            clearEditor();
-            showToast('编辑器已清空 🧹', 'info');
+        document.getElementById('btnPaste').addEventListener('click', () => {
+            if (navigator.clipboard) navigator.clipboard.readText().then(t => {
+                if (t.trim()) { codeEditor.focus(); document.execCommand('insertText', false, t); showToast('已粘贴'); }
+                else showToast('剪贴板为空');
+            }).catch(() => showToast('无法读取剪贴板'));
+            else showToast('请使用 Ctrl+V');
         });
-        btnNew.addEventListener('click', newCandy);
+        document.getElementById('btnPreview').addEventListener('click', () => openPreview(codeEditor.value));
+        document.getElementById('btnClear').addEventListener('click', () => {
+            codeEditor.value = ''; candyNameInput.value = ''; currentEditingId = null;
+            renderCandyList(); showToast('已清空');
+        });
+        document.getElementById('btnNew').addEventListener('click', () => {
+            if (codeEditor.value.trim() && !confirm('新建会清空未保存内容，确定？')) return;
+            codeEditor.value = ''; candyNameInput.value = ''; currentEditingId = null;
+            renderCandyList(); showToast('开始新糖果');
+        });
+        document.getElementById('btnImport').addEventListener('click', importFile);
 
-        candyNameInput.addEventListener('input', () => {
-            // 名称变化仅用于显示，保存时读取
+        // 糖罐列表事件委托
+        candyList.addEventListener('click', e => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+            const action = btn.dataset.action, id = btn.dataset.id;
+            if (action && id) handleAction(action, id);
         });
 
-        function init() {
-            loadCandiesFromStorage();
-            if (candies.length > 0) {
-                const latest = candies[candies.length - 1];
-                codeEditor.value = latest.code;
-                candyNameInput.value = latest.name || '';
-                currentEditingId = latest.id;
-            } else {
-                codeEditor.value = `<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <title>✨ 我的第一颗糖果</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #e3f2fd, #fff3e0);
-            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        // 快捷键
+        codeEditor.addEventListener('keydown', e => {
+            if ((e.ctrlKey||e.metaKey) && e.key === 's') { e.preventDefault(); saveCurrentCode(); }
+            if ((e.ctrlKey||e.metaKey) && e.key === 'Enter') { e.preventDefault(); openPreview(codeEditor.value); }
+            if (e.key === 'Tab') { e.preventDefault(); const s=this.selectionStart, e2=this.selectionEnd; this.value=this.value.substring(0,s)+'    '+this.value.substring(e2); this.selectionStart=this.selectionEnd=s+4; }
+        });
+
+        // 初始化
+        loadCandies();
+        if (candies.length) {
+            const latest = candies[candies.length-1];
+            codeEditor.value = latest.code; candyNameInput.value = latest.name||''; currentEditingId = latest.id;
+        } else {
+            codeEditor.value = `<!DOCTYPE html>\n<html>\n<head><title>我的代码</title></head>\n<body>\n  <h1>Hello YG小糖罐</h1>\n</body>\n</html>`;
+            candyNameInput.value = '示例糖果';
         }
-        .candy-card {
-            background: white;
-            padding: 40px 50px;
-            border-radius: 24px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-            text-align: center;
-        }
-        h1 { color: #ff8c52; font-size: 2rem; margin: 0 0 8px; }
-        p { color: #7a7288; font-size: 1rem; }
-        .emoji { font-size: 3rem; display: block; margin-bottom: 12px; }
-    </style>
-</head>
-<body>
-    <div class="candy-card">
-        <span class="emoji">🍬</span>
-        <h1>YG小糖罐</h1>
-        <p>你的第一颗代码糖果诞生啦！</p>
-        <p style="font-size:0.8rem;color:#b5aac5;">点击右侧卡片上的按钮试试～</p>
-    </div>
-</body>
-</html>`;
-                candyNameInput.value = '欢迎糖果';
-                currentEditingId = null;
-            }
-            renderCandyList();
-            codeEditor.focus();
-            const len = codeEditor.value.length;
-            codeEditor.setSelectionRange(len, len);
-        }
-
-        init();
-
-        window.addEventListener('beforeunload', function(e) {
-            if (codeEditor.value.trim() && currentEditingId === null) {
-                const msg = '你有未保存的代码，离开页面将丢失。确定要离开吗？';
-                e.preventDefault();
-                e.returnValue = msg;
-                return msg;
-            }
-            if (currentEditingId) {
-                const candy = candies.find(c => c.id === currentEditingId);
-                if (candy && candy.code !== codeEditor.value) {
-                    const msg = '当前糖果有未保存的修改，离开页面将丢失。确定要离开吗？';
-                    e.preventDefault();
-                    e.returnValue = msg;
-                    return msg;
-                }
-            }
-        });
-
-        console.log('🍬 YG小糖罐已升级！');
-        console.log('✨ 新功能：编辑名称、调整顺序、点击卡片取消选择');
+        renderCandyList();
     })();
-</script>
+    </script>
 </body>
 </html>
