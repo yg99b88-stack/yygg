@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YG小糖罐 - 代码糖果收藏馆</title>
+    <title>YG小糖罐 · 可编辑排序的代码糖果盒</title>
     <style>
         :root {
             --bg: #f5f0f8;
@@ -367,7 +367,6 @@
             border-color: #d0c5dd;
             color: #5a4e6e;
         }
-        /* 新增清空按钮样式，保持柔和 */
         .btn-clear {
             background: #fff5f5;
             color: #c0848c;
@@ -429,14 +428,14 @@
         }
 
         .jar-panel {
-            flex: 0 0 340px;
-            width: 340px;
+            flex: 0 0 360px;
+            width: 360px;
             background: var(--card-bg);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-md);
             display: flex;
             flex-direction: column;
-            max-height: 560px;
+            max-height: 600px;
             border: 1px solid rgba(255, 183, 77, 0.2);
             overflow: hidden;
         }
@@ -595,8 +594,10 @@
         }
         .candy-actions {
             display: flex;
+            flex-wrap: wrap;
             gap: 3px;
             flex-shrink: 0;
+            align-items: center;
         }
         .candy-actions .btn-mini {
             padding: 4px 7px;
@@ -611,6 +612,7 @@
             letter-spacing: 0.2px;
             white-space: nowrap;
             -webkit-tap-highlight-color: transparent;
+            line-height: 1.2;
         }
         .candy-actions .btn-mini:hover {
             background: #f5effa;
@@ -634,6 +636,11 @@
             background: #f3f9fd;
             border-color: #b3d9ff;
             color: #5a9fc0;
+        }
+        /* 移动与编辑按钮更紧凑 */
+        .candy-actions .btn-mini.btn-move {
+            padding: 3px 5px;
+            font-size: 0.7rem;
         }
 
         .toast-container {
@@ -761,25 +768,12 @@
                     placeholder="🍭 给这颗糖果起个名字..."
                     maxlength="60"
                     >
-                    <button class="btn btn-save" id="btnSave" title="保存到糖罐 (Ctrl+S)">
-                        💾 保存
-                    </button>
-                    <button class="btn btn-copy" id="btnCopyEditor" title="复制编辑器中的代码">
-                        📋 复制
-                    </button>
-                    <button class="btn btn-paste" id="btnPaste" title="从剪切板粘贴代码">
-                        📥 粘贴
-                    </button>
-                    <button class="btn btn-preview" id="btnPreview" title="全屏预览HTML效果">
-                        🔍 预览
-                    </button>
-                    <!-- 新增清空按钮 -->
-                    <button class="btn btn-clear" id="btnClear" title="清空编辑器内容（不保存）">
-                        🧹 清空
-                    </button>
-                    <button class="btn btn-new" id="btnNew" title="新建糖果（清空并创建新糖果）">
-                        ✨ 新建
-                    </button>
+                    <button class="btn btn-save" id="btnSave" title="保存到糖罐 (Ctrl+S)">💾 保存</button>
+                    <button class="btn btn-copy" id="btnCopyEditor" title="复制编辑器中的代码">📋 复制</button>
+                    <button class="btn btn-paste" id="btnPaste" title="从剪切板粘贴代码">📥 粘贴</button>
+                    <button class="btn btn-preview" id="btnPreview" title="全屏预览HTML效果">🔍 预览</button>
+                    <button class="btn btn-clear" id="btnClear" title="清空编辑器内容（不保存）">🧹 清空</button>
+                    <button class="btn btn-new" id="btnNew" title="新建糖果（清空并创建新糖果）">✨ 新建</button>
                 </div>
                 <div class="editor-wrapper">
                     <textarea
@@ -814,7 +808,6 @@
         const codeEditor = document.getElementById('codeEditor');
         const candyNameInput = document.getElementById('candyNameInput');
         const candyList = document.getElementById('candyList');
-        const emptyJar = document.getElementById('emptyJar');
         const candyCountEl = document.getElementById('candyCount');
         const jarPanelCount = document.getElementById('jarPanelCount');
         const toastContainer = document.getElementById('toastContainer');
@@ -823,10 +816,10 @@
         const btnPaste = document.getElementById('btnPaste');
         const btnPreview = document.getElementById('btnPreview');
         const btnNew = document.getElementById('btnNew');
-        const btnClear = document.getElementById('btnClear'); // 新增
+        const btnClear = document.getElementById('btnClear');
 
         const STORAGE_KEY = 'yg_sugar_jar_candies';
-        let candies = [];
+        let candies = []; // 存储顺序：越靠后越新（显示时reverse，即最新的在最上面）
         let currentEditingId = null;
 
         function loadCandiesFromStorage() {
@@ -839,7 +832,7 @@
                     candies = [];
                 }
             } catch (e) {
-                console.warn('读取存储失败，已重置糖罐', e);
+                console.warn('读取存储失败', e);
                 candies = [];
                 localStorage.removeItem(STORAGE_KEY);
             }
@@ -854,7 +847,6 @@
                 } else {
                     showToast('保存失败，请重试 😢', 'error');
                 }
-                console.error('存储失败:', e);
             }
         }
 
@@ -869,11 +861,7 @@
         function formatDate(isoStr) {
             try {
                 const d = new Date(isoStr);
-                const month = d.getMonth() + 1;
-                const day = d.getDate();
-                const hour = d.getHours().toString().padStart(2, '0');
-                const min = d.getMinutes().toString().padStart(2, '0');
-                return `${month}月${day}日 ${hour}:${min}`;
+                return `${d.getMonth()+1}月${d.getDate()}日 ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
             } catch (e) {
                 return isoStr.slice(0, 16);
             }
@@ -885,65 +873,8 @@
             toast.textContent = message;
             toastContainer.appendChild(toast);
             setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.remove();
-                }
+                if (toast.parentNode) toast.remove();
             }, 2200);
-        }
-
-        function renderCandyList() {
-            candyList.innerHTML = '';
-            if (candies.length === 0) {
-                const emptyDiv = document.createElement('div');
-                emptyDiv.className = 'empty-jar';
-                emptyDiv.id = 'emptyJar';
-                emptyDiv.innerHTML = `
-                        <span class="empty-icon">🫙</span>
-                        <span class="empty-text">糖罐空空如也~</span>
-                        <span style="font-size:0.72rem;color:#d5cee0;">写一段代码，保存你的第一颗糖果吧！</span>
-                    `;
-                candyList.appendChild(emptyDiv);
-            } else {
-                const sorted = [...candies].reverse();
-                sorted.forEach(candy => {
-                    const item = document.createElement('div');
-                    item.className = 'candy-item';
-                    if (candy.id === currentEditingId) {
-                        item.classList.add('active');
-                    }
-                    item.innerHTML = `
-                            <span class="candy-dot"></span>
-                            <div class="candy-info">
-                                <span class="candy-name">${escapeHTML(candy.name || '未命名糖果')}</span>
-                                <span class="candy-meta">${formatDate(candy.createdAt)} · ${countCodeLines(candy.code)}行</span>
-                            </div>
-                            <div class="candy-actions">
-                                <button class="btn-mini btn-load" data-action="load" data-id="${candy.id}" title="加载到编辑器">📝 加载</button>
-                                <button class="btn-mini" data-action="copy" data-id="${candy.id}" title="复制代码">📋</button>
-                                <button class="btn-mini" data-action="preview" data-id="${candy.id}" title="全屏预览">🔍</button>
-                                <button class="btn-mini btn-del" data-action="delete" data-id="${candy.id}" title="删除">🗑</button>
-                            </div>
-                        `;
-                    item.addEventListener('click', function(e) {
-                        if (e.target.closest('button')) return;
-                        loadCandyToEditor(candy.id);
-                    });
-                    candyList.appendChild(item);
-                });
-
-                candyList.querySelectorAll('button[data-action]').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        const action = this.dataset.action;
-                        const id = this.dataset.id;
-                        handleCandyAction(action, id);
-                    });
-                });
-            }
-
-            const count = candies.length;
-            candyCountEl.textContent = count;
-            jarPanelCount.textContent = `${count} 颗糖果`;
         }
 
         function escapeHTML(str) {
@@ -957,41 +888,105 @@
             return code.split('\n').filter(line => line.trim().length > 0).length || code.split('\n').length;
         }
 
+        // 渲染糖罐列表（含移动、编辑按钮）
+        function renderCandyList() {
+            candyList.innerHTML = '';
+            if (candies.length === 0) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'empty-jar';
+                emptyDiv.id = 'emptyJar';
+                emptyDiv.innerHTML = `
+                    <span class="empty-icon">🫙</span>
+                    <span class="empty-text">糖罐空空如也~</span>
+                    <span style="font-size:0.72rem;color:#d5cee0;">写一段代码，保存你的第一颗糖果吧！</span>
+                `;
+                candyList.appendChild(emptyDiv);
+            } else {
+                const sorted = [...candies].reverse(); // 最新在前显示
+                sorted.forEach((candy, displayIdx) => {
+                    const item = document.createElement('div');
+                    item.className = 'candy-item';
+                    if (candy.id === currentEditingId) item.classList.add('active');
+
+                    // 上移下移按钮：只有多于1颗时才有效，但始终渲染
+                    const isFirst = displayIdx === 0;
+                    const isLast = displayIdx === sorted.length - 1;
+                    const moveUpDisabled = isFirst ? 'disabled' : '';
+                    const moveDownDisabled = isLast ? 'disabled' : '';
+
+                    item.innerHTML = `
+                        <span class="candy-dot"></span>
+                        <div class="candy-info">
+                            <span class="candy-name">${escapeHTML(candy.name || '未命名糖果')}</span>
+                            <span class="candy-meta">${formatDate(candy.createdAt)} · ${countCodeLines(candy.code)}行</span>
+                        </div>
+                        <div class="candy-actions">
+                            <button class="btn-mini btn-load" data-action="load" data-id="${candy.id}" title="加载到编辑器">📝</button>
+                            <button class="btn-mini" data-action="copy" data-id="${candy.id}" title="复制代码">📋</button>
+                            <button class="btn-mini" data-action="preview" data-id="${candy.id}" title="全屏预览">🔍</button>
+                            <button class="btn-mini btn-del" data-action="delete" data-id="${candy.id}" title="删除">🗑</button>
+                            <button class="btn-mini" data-action="editName" data-id="${candy.id}" title="编辑名称">✏️</button>
+                            <button class="btn-mini btn-move" data-action="moveUp" data-id="${candy.id}" title="上移" ${moveUpDisabled}>⬆️</button>
+                            <button class="btn-mini btn-move" data-action="moveDown" data-id="${candy.id}" title="下移" ${moveDownDisabled}>⬇️</button>
+                        </div>
+                    `;
+
+                    // 整行点击：加载或取消选择
+                    item.addEventListener('click', function(e) {
+                        if (e.target.closest('button')) return;
+                        if (candy.id === currentEditingId) {
+                            // 再次点击已激活糖果 → 取消选择
+                            deselectCandy();
+                        } else {
+                            loadCandyToEditor(candy.id);
+                        }
+                    });
+
+                    // 所有按钮事件委托
+                    item.querySelectorAll('button[data-action]').forEach(btn => {
+                        btn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const action = this.dataset.action;
+                            const id = this.dataset.id;
+                            handleCandyAction(action, id);
+                        });
+                    });
+
+                    candyList.appendChild(item);
+                });
+            }
+
+            const count = candies.length;
+            candyCountEl.textContent = count;
+            jarPanelCount.textContent = `${count} 颗糖果`;
+        }
+
+        // 糖果操作分发
         function handleCandyAction(action, id) {
-            const candy = candies.find(c => c.id === id);
-            if (!candy && action !== 'delete') return;
             switch (action) {
-                case 'load':
-                    loadCandyToEditor(id);
-                    break;
-                case 'copy':
-                    copyCandyCode(id);
-                    break;
-                case 'preview':
-                    previewCandyCode(id);
-                    break;
-                case 'delete':
-                    deleteCandy(id);
-                    break;
+                case 'load': loadCandyToEditor(id); break;
+                case 'copy': copyCandyCode(id); break;
+                case 'preview': previewCandyCode(id); break;
+                case 'delete': deleteCandy(id); break;
+                case 'editName': editCandyName(id); break;
+                case 'moveUp': moveCandyUp(id); break;
+                case 'moveDown': moveCandyDown(id); break;
             }
         }
 
         function loadCandyToEditor(id) {
             const candy = candies.find(c => c.id === id);
             if (!candy) return;
+            // 如果编辑器中有未保存内容且不是当前正在编辑的糖果，提示
             if (codeEditor.value.trim() && currentEditingId !== id) {
                 const currentCandy = candies.find(c => c.id === currentEditingId);
                 const isSameAsCurrent = currentCandy && currentCandy.code === codeEditor.value;
                 const isSameAsTarget = candy.code === codeEditor.value;
                 if (!isSameAsCurrent && !isSameAsTarget && currentEditingId === null) {
-                    if (!confirm('编辑器中有未保存的代码，加载新糖果将覆盖它们。确定要加载吗？')) {
-                        return;
-                    }
+                    if (!confirm('编辑器中有未保存的代码，加载新糖果将覆盖它们。确定要加载吗？')) return;
                 }
                 if (!isSameAsCurrent && !isSameAsTarget && currentEditingId !== null && currentEditingId !== id) {
-                    if (!confirm('你正在编辑另一颗糖果（可能有未保存的修改），加载新糖果将覆盖编辑器内容。确定要加载吗？')) {
-                        return;
-                    }
+                    if (!confirm('你正在编辑另一颗糖果（可能有未保存的修改），加载新糖果将覆盖编辑器内容。确定要加载吗？')) return;
                 }
             }
             codeEditor.value = candy.code;
@@ -1000,6 +995,16 @@
             renderCandyList();
             codeEditor.focus();
             showToast(`已加载糖果：「${candy.name || '未命名'}」🍬`, 'info');
+        }
+
+        // 取消选择糖果
+        function deselectCandy() {
+            codeEditor.value = '';
+            candyNameInput.value = '';
+            currentEditingId = null;
+            renderCandyList();
+            showToast('已取消选择糖果，编辑器已清空', 'info');
+            codeEditor.focus();
         }
 
         function copyCandyCode(id) {
@@ -1017,22 +1022,67 @@
         function deleteCandy(id) {
             const candy = candies.find(c => c.id === id);
             if (!candy) return;
-            if (!confirm(`确定要删除糖果「${candy.name || '未命名'}」吗？此操作不可恢复哦~ 🗑`)) {
-                return;
-            }
+            if (!confirm(`确定要删除糖果「${candy.name || '未命名'}」吗？此操作不可恢复哦~ 🗑`)) return;
             candies = candies.filter(c => c.id !== id);
             if (currentEditingId === id) {
                 currentEditingId = null;
             }
             saveCandiesToStorage();
             renderCandyList();
-            showToast(`糖果已从糖罐中移除 🗑`, 'info');
+            showToast('糖果已从糖罐中移除 🗑', 'info');
+        }
+
+        // 编辑糖果名称
+        function editCandyName(id) {
+            const candy = candies.find(c => c.id === id);
+            if (!candy) return;
+            const newName = prompt('请输入新的糖果名称', candy.name || '未命名糖果');
+            if (newName !== null && newName.trim() !== '') {
+                candy.name = newName.trim();
+                saveCandiesToStorage();
+                renderCandyList();
+                // 如果正在编辑这个糖果，同步更新名称输入框
+                if (currentEditingId === id) {
+                    candyNameInput.value = candy.name;
+                }
+                showToast('糖果名称已更新 ✏️', 'success');
+            } else if (newName !== null && newName.trim() === '') {
+                showToast('名称不能为空哦~', 'error');
+            }
+        }
+
+        // 上移糖果（显示位置向上移动，即与上一个糖果交换位置）
+        function moveCandyUp(id) {
+            const idx = candies.findIndex(c => c.id === id);
+            if (idx === -1) return;
+            // 显示索引 = 总长度 - 1 - 原始索引
+            const displayIdx = candies.length - 1 - idx;
+            if (displayIdx <= 0) return; // 已经在最顶部
+            // 需要与显示中前一个糖果（displayIdx-1）交换，其原始索引为 len - displayIdx
+            const swapIdx = candies.length - displayIdx;
+            [candies[idx], candies[swapIdx]] = [candies[swapIdx], candies[idx]];
+            saveCandiesToStorage();
+            renderCandyList();
+            showToast('糖果顺序已更新 ⬆️', 'info');
+        }
+
+        // 下移糖果
+        function moveCandyDown(id) {
+            const idx = candies.findIndex(c => c.id === id);
+            if (idx === -1) return;
+            const displayIdx = candies.length - 1 - idx;
+            if (displayIdx >= candies.length - 1) return; // 已经在最底部
+            // 与显示中后一个糖果（displayIdx+1）交换，其原始索引为 len - 2 - displayIdx
+            const swapIdx = candies.length - 2 - displayIdx;
+            [candies[idx], candies[swapIdx]] = [candies[swapIdx], candies[idx]];
+            saveCandiesToStorage();
+            renderCandyList();
+            showToast('糖果顺序已更新 ⬇️', 'info');
         }
 
         function saveCurrentCode() {
             const code = codeEditor.value;
             const name = candyNameInput.value.trim() || generateDefaultName(code);
-
             if (currentEditingId) {
                 const idx = candies.findIndex(c => c.id === currentEditingId);
                 if (idx >= 0) {
@@ -1040,7 +1090,7 @@
                     candies[idx].name = name;
                     candies[idx].createdAt = getNowISO();
                     const [updated] = candies.splice(idx, 1);
-                    candies.push(updated);
+                    candies.push(updated); // 更新后放到末尾（最新）
                     saveCandiesToStorage();
                     renderCandyList();
                     showToast(`糖果「${name}」已更新！🍬✨`, 'success');
@@ -1069,24 +1119,15 @@
             if (!code || code.trim() === '') return '空糖果';
             const trimmed = code.trim();
             const titleMatch = trimmed.match(/<title[^>]*>([^<]*)<\/title>/i);
-            if (titleMatch && titleMatch[1].trim()) {
-                return titleMatch[1].trim().slice(0, 40);
-            }
+            if (titleMatch && titleMatch[1].trim()) return titleMatch[1].trim().slice(0, 40);
             const firstLine = trimmed.split('\n')[0].replace(/<[^>]+>/g, '').trim();
-            if (firstLine && firstLine.length > 0) {
-                return firstLine.slice(0, 35) + (firstLine.length > 35 ? '...' : '');
-            }
-            return '糖果-' + new Date().toLocaleDateString('zh-CN', { month: 'short', day: 'numeric',
-                hour: '2-digit', minute: '2-digit' });
+            if (firstLine && firstLine.length > 0) return firstLine.slice(0, 35) + (firstLine.length > 35 ? '...' : '');
+            return '糖果-' + new Date().toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         }
 
         function copyToClipboard(text, successMsg) {
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showToast(successMsg || '已复制到剪切板 📋', 'success');
-                }).catch(() => {
-                    fallbackCopy(text, successMsg);
-                });
+                navigator.clipboard.writeText(text).then(() => showToast(successMsg, 'success')).catch(() => fallbackCopy(text, successMsg));
             } else {
                 fallbackCopy(text, successMsg);
             }
@@ -1103,14 +1144,10 @@
             textarea.focus();
             textarea.select();
             try {
-                const successful = document.execCommand('copy');
-                if (successful) {
-                    showToast(successMsg || '已复制到剪切板 📋', 'success');
-                } else {
-                    showToast('复制失败，请手动选择代码后 Ctrl+C 复制', 'error');
-                }
+                if (document.execCommand('copy')) showToast(successMsg, 'success');
+                else showToast('复制失败，请手动复制', 'error');
             } catch (e) {
-                showToast('复制失败，请手动选择代码后 Ctrl+C 复制', 'error');
+                showToast('复制失败，请手动复制', 'error');
             }
             document.body.removeChild(textarea);
         }
@@ -1124,9 +1161,7 @@
                     } else {
                         showToast('剪切板中没有文本内容哦~', 'info');
                     }
-                }).catch(() => {
-                    showToast('无法读取剪切板，请使用 Ctrl+V 粘贴 🙏', 'error');
-                });
+                }).catch(() => showToast('无法读取剪切板，请使用 Ctrl+V 粘贴 🙏', 'error'));
             } else {
                 showToast('当前环境不支持剪切板读取，请使用 Ctrl+V 粘贴 🙏', 'error');
             }
@@ -1135,9 +1170,7 @@
         function insertTextAtCursor(textarea, text) {
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
-            const before = textarea.value.substring(0, start);
-            const after = textarea.value.substring(end);
-            textarea.value = before + text + after;
+            textarea.value = textarea.value.substring(0, start) + text + textarea.value.substring(end);
             textarea.selectionStart = textarea.selectionEnd = start + text.length;
             textarea.focus();
         }
@@ -1151,43 +1184,33 @@
                 const blob = new Blob([code], { type: 'text/html;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 const previewWindow = window.open(url, '_blank', 'fullscreen=yes');
-                if (!previewWindow) {
-                    showToast('预览窗口被浏览器拦截啦，请允许弹窗后重试 🔍', 'error');
-                }
-                setTimeout(() => {
-                    URL.revokeObjectURL(url);
-                }, 3000);
+                if (!previewWindow) showToast('预览窗口被浏览器拦截啦，请允许弹窗后重试 🔍', 'error');
+                setTimeout(() => URL.revokeObjectURL(url), 3000);
             } catch (e) {
                 showToast('预览失败，请检查代码是否有误 😢', 'error');
-                console.error('预览错误:', e);
             }
         }
 
-        function newCandy() {
-            if (codeEditor.value.trim() && currentEditingId === null) {
-                if (!confirm('当前编辑器中有未保存的代码，新建将清空它们。确定要新建吗？')) {
-                    return;
-                }
-            }
-            if (currentEditingId && codeEditor.value.trim()) {
-                const currentCandy = candies.find(c => c.id === currentEditingId);
-                if (currentCandy && currentCandy.code !== codeEditor.value) {
-                    if (!confirm('当前糖果有未保存的修改，新建将清空编辑器。确定要新建吗？')) {
-                        return;
-                    }
-                }
-            }
-            clearEditor();
-            showToast('已清空编辑器，开始制作新糖果吧！✨', 'info');
-        }
-
-        // 新增清空功能（不提示，直接清空）
         function clearEditor() {
             codeEditor.value = '';
             candyNameInput.value = '';
             currentEditingId = null;
             renderCandyList();
             codeEditor.focus();
+        }
+
+        function newCandy() {
+            if (codeEditor.value.trim() && currentEditingId === null) {
+                if (!confirm('当前编辑器中有未保存的代码，新建将清空它们。确定要新建吗？')) return;
+            }
+            if (currentEditingId && codeEditor.value.trim()) {
+                const currentCandy = candies.find(c => c.id === currentEditingId);
+                if (currentCandy && currentCandy.code !== codeEditor.value) {
+                    if (!confirm('当前糖果有未保存的修改，新建将清空编辑器。确定要新建吗？')) return;
+                }
+            }
+            clearEditor();
+            showToast('已清空编辑器，开始制作新糖果吧！✨', 'info');
         }
 
         // 快捷键
@@ -1204,36 +1227,27 @@
                 e.preventDefault();
                 const start = this.selectionStart;
                 const end = this.selectionEnd;
-                const before = this.value.substring(0, start);
-                const after = this.value.substring(end);
-                const indent = '    ';
-                this.value = before + indent + after;
-                this.selectionStart = this.selectionEnd = start + indent.length;
+                this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
+                this.selectionStart = this.selectionEnd = start + 4;
             }
         });
 
+        // 按钮绑定
         btnSave.addEventListener('click', saveCurrentCode);
-        btnCopyEditor.addEventListener('click', function() {
-            const code = codeEditor.value;
-            if (!code || code.trim() === '') {
-                showToast('编辑器为空，没有什么可复制的哦~ 🍬', 'info');
-                return;
-            }
-            copyToClipboard(code, '编辑器代码已复制到剪切板 📋');
+        btnCopyEditor.addEventListener('click', () => {
+            if (!codeEditor.value.trim()) return showToast('编辑器为空，没有什么可复制的哦~ 🍬', 'info');
+            copyToClipboard(codeEditor.value, '编辑器代码已复制到剪切板 📋');
         });
         btnPaste.addEventListener('click', pasteFromClipboard);
-        btnPreview.addEventListener('click', function() {
-            openFullscreenPreview(codeEditor.value);
-        });
-        btnNew.addEventListener('click', newCandy);
-        // 清空按钮事件
-        btnClear.addEventListener('click', function() {
+        btnPreview.addEventListener('click', () => openFullscreenPreview(codeEditor.value));
+        btnClear.addEventListener('click', () => {
             clearEditor();
             showToast('编辑器已清空 🧹', 'info');
         });
+        btnNew.addEventListener('click', newCandy);
 
-        candyNameInput.addEventListener('input', function() {
-            // 仅用于显示
+        candyNameInput.addEventListener('input', () => {
+            // 名称变化仅用于显示，保存时读取
         });
 
         function init() {
@@ -1245,74 +1259,73 @@
                 currentEditingId = latest.id;
             } else {
                 codeEditor.value = `<!DOCTYPE html>
-        <html lang="zh-CN">
-        <head>
-            <meta charset="UTF-8">
-            <title>✨ 我的第一颗糖果</title>
-            <style>
-                body {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    min-height: 100vh;
-                    margin: 0;
-                    background: linear-gradient(135deg, #e3f2fd, #fff3e0);
-                    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-                }
-                .candy-card {
-                    background: white;
-                    padding: 40px 50px;
-                    border-radius: 24px;
-                    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-                    text-align: center;
-                }
-                h1 { color: #ff8c52; font-size: 2rem; margin: 0 0 8px; }
-                p { color: #7a7288; font-size: 1rem; }
-                .emoji { font-size: 3rem; display: block; margin-bottom: 12px; }
-</style>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>✨ 我的第一颗糖果</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #e3f2fd, #fff3e0);
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        .candy-card {
+            background: white;
+            padding: 40px 50px;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        h1 { color: #ff8c52; font-size: 2rem; margin: 0 0 8px; }
+        p { color: #7a7288; font-size: 1rem; }
+        .emoji { font-size: 3rem; display: block; margin-bottom: 12px; }
+    </style>
 </head>
 <body>
     <div class="candy-card">
         <span class="emoji">🍬</span>
         <h1>YG小糖罐</h1>
         <p>你的第一颗代码糖果诞生啦！</p>
-        <p style="font-size:0.8rem;color:#b5aac5;">点击右上角「预览」查看效果</p>
+        <p style="font-size:0.8rem;color:#b5aac5;">点击右侧卡片上的按钮试试～</p>
     </div>
 </body>
 </html>`;
-candyNameInput.value = '欢迎糖果';
-currentEditingId = null;
-}
-renderCandyList();
-codeEditor.focus();
-const len = codeEditor.value.length;
-codeEditor.setSelectionRange(len, len);
-}
+                candyNameInput.value = '欢迎糖果';
+                currentEditingId = null;
+            }
+            renderCandyList();
+            codeEditor.focus();
+            const len = codeEditor.value.length;
+            codeEditor.setSelectionRange(len, len);
+        }
 
-init();
+        init();
 
-window.addEventListener('beforeunload', function(e) {
-if (codeEditor.value.trim() && currentEditingId === null) {
-const msg = '你有未保存的代码，离开页面将丢失。确定要离开吗？';
-e.preventDefault();
-e.returnValue = msg;
-return msg;
-}
-if (currentEditingId) {
-const candy = candies.find(c => c.id === currentEditingId);
-if (candy && candy.code !== codeEditor.value) {
-const msg = '当前糖果有未保存的修改，离开页面将丢失。确定要离开吗？';
-e.preventDefault();
-e.returnValue = msg;
-return msg;
-}
-}
-});
+        window.addEventListener('beforeunload', function(e) {
+            if (codeEditor.value.trim() && currentEditingId === null) {
+                const msg = '你有未保存的代码，离开页面将丢失。确定要离开吗？';
+                e.preventDefault();
+                e.returnValue = msg;
+                return msg;
+            }
+            if (currentEditingId) {
+                const candy = candies.find(c => c.id === currentEditingId);
+                if (candy && candy.code !== codeEditor.value) {
+                    const msg = '当前糖果有未保存的修改，离开页面将丢失。确定要离开吗？';
+                    e.preventDefault();
+                    e.returnValue = msg;
+                    return msg;
+                }
+            }
+        });
 
-console.log('🍬 YG小糖罐已就绪！');
-console.log('💡 提示：Ctrl+S 保存 | Ctrl+Enter 预览 | Tab 缩进');
-console.log('🍯 糖罐中有 ' + candies.length + ' 颗糖果等待品尝~');
-})();
+        console.log('🍬 YG小糖罐已升级！');
+        console.log('✨ 新功能：编辑名称、调整顺序、点击卡片取消选择');
+    })();
 </script>
 </body>
 </html>
